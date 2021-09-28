@@ -18,7 +18,7 @@ namespace WebApi.Helpers
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
       // connect to sqlite database
-      options.UseNpgsql("Host=localhost;Database=compManager;Username=postgres;Password=Br0j4h!123");
+      options.UseNpgsql(Configuration.GetConnectionString("CompManagerBackend"));
     }
   }
 }

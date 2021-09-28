@@ -19,13 +19,21 @@ public class AuthorizeAttribute : Attribute, IAuthorizationFilter
   public void OnAuthorization(AuthorizationFilterContext context)
   {
     var account = (Account)context.HttpContext.Items["Account"];
-    int roleSum = _roles.Sum(x => Convert.ToInt32(x));
-    int role = Convert.ToInt32(account.Role);
-    if (roleSum > role)
-      if (account == null || (_roles.Any() && (Convert.ToBoolean(roleSum & role) == false)))
-      {
-        // not logged in or role not authorized
-        context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
-      }
+    if (account == null || (_roles.Any() && !CheckRoles(_roles, account)))
+    {
+      // not logged in or role not authorized
+      context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+    }
+  }
+
+  public bool CheckRoles(IList<Role> _roles, Account account)
+  {
+    if (account != null)
+    {
+      int roleSum = _roles.Sum(x => Convert.ToInt32(x));
+      int role = Convert.ToInt32(account.Role);
+      return Convert.ToBoolean(roleSum & role);
+    }
+    else return false;
   }
 }

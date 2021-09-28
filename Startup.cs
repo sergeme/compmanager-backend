@@ -44,13 +44,14 @@ namespace WebApi
       app.UsePathBase("/api/v1");
       // generated swagger json and swagger ui middleware
       app.UseSwagger();
-      app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", ".NET Sign-up and Verification API"));
+      app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Compmanager Backend"));
 
       app.UseRouting();
 
       // global cors policy
       app.UseCors(x => x
           .SetIsOriginAllowed(origin => true)
+          .WithOrigins(Configuration.GetSection("Appsettings")["FrontendBaseUrl"])
           .AllowAnyMethod()
           .AllowAnyHeader()
           .AllowCredentials());
