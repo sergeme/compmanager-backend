@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using WebApi.Entities;
-using WebApi.Helpers;
-using WebApi.Models.Accounts;
-using WebApi.Services;
+using CompManager.Entities;
+using CompManager.Helpers;
+using CompManager.Models.Accounts;
+using CompManager.Services;
 
-namespace WebApi.Controllers
+namespace CompManager.Controllers
 {
   [ApiController]
   [Route("[controller]")]
@@ -107,7 +107,7 @@ namespace WebApi.Controllers
       return Ok(accounts);
     }
 
-    [Authorize]
+    [Authorize(Role.ROLE_STUDENT, Role.ROLE_TEACHER, Role.ROLE_ADMIN)]
     [HttpGet("{id:int}")]
     public ActionResult<AccountResponse> GetById(int id)
     {

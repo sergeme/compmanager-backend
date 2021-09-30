@@ -1,7 +1,7 @@
-namespace WebApi.Models.Accounts
+namespace CompManager.Models.Accounts
 {
-    public class RevokeTokenRequest
-    {
-        public string Token { get; set; }
-    }
+  public class RevokeTokenRequest
+  {
+    public string Token { get; set; }
+  }
 }

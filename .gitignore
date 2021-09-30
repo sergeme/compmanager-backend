@@ -42,4 +42,4 @@ bin
 obj
 
 # Generated SQLite db
-WebApiDatabase.db
+CompManagerDatabase.db

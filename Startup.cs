@@ -2,12 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 using System;
-using WebApi.Helpers;
-using WebApi.Middleware;
-using WebApi.Services;
+using CompManager.Helpers;
+using CompManager.Middleware;
+using CompManager.Services;
 
-namespace WebApi
+namespace CompManager
 {
   public class Startup
   {
@@ -23,9 +24,16 @@ namespace WebApi
     {
       services.AddDbContext<DataContext>();
       services.AddCors();
-      services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
+      services.AddControllers().AddNewtonsoftJson(options =>
+      {
+        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+
+      });
       services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-      services.AddSwaggerGen();
+      services.AddSwaggerGen(options =>
+      {
+        options.CustomSchemaIds(type => type.ToString());
+      });
 
       // configure strongly typed settings object
       services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
@@ -36,7 +44,11 @@ namespace WebApi
       services.AddScoped<ICompetenceService, CompetenceService>();
       services.AddScoped<ICourseService, CourseService>();
       services.AddScoped<ICurriculumService, CurriculumService>();
+      services.AddScoped<IDepartmentService, DepartmentService>();
       services.AddScoped<IEmailService, EmailService>();
+      services.AddScoped<ILocationService, LocationService>();
+      services.AddScoped<IProcessService, ProcessService>();
+      services.AddScoped<IProcessTypeService, ProcessTypeService>();
     }
 
     // configure the HTTP request pipeline

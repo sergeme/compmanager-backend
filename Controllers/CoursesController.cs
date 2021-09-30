@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using WebApi.Entities;
-using WebApi.Helpers;
-using WebApi.Models.Accounts;
-using WebApi.Services;
+using CompManager.Entities;
+using CompManager.Helpers;
+using CompManager.Models.Courses;
+using CompManager.Services;
 
-namespace WebApi.Controllers
+namespace CompManager.Controllers
 {
   [ApiController]
   [Route("[controller]")]
@@ -29,10 +29,36 @@ namespace WebApi.Controllers
       _mapper = mapper;
     }
 
-    [HttpPost("")]
-    public ActionResult<AuthenticateResponse> Authenticate(AuthenticateRequest model)
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPost]
+    public ActionResult<CourseResponse> Create(CreateRequest model)
     {
-      return Ok();
+      var course = _courseService.Create(model);
+      return Ok(course);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpGet]
+    public ActionResult<IEnumerable<CourseResponse>> GetAll()
+    {
+      var courses = _courseService.GetAll();
+      return Ok(courses);
+    }
+
+    [Authorize]
+    [HttpPut("{id:int}")]
+    public ActionResult<CourseResponse> Update(int id, UpdateRequest model)
+    {
+      var course = _courseService.Update(id, model);
+      return Ok(course);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete(int id)
+    {
+      _courseService.Delete(id);
+      return Ok(new { message = "Lehrgang gelöscht" });
     }
   }
 }

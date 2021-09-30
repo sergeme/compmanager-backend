@@ -1,7 +1,7 @@
 using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
-namespace WebApi.Models.Accounts
+namespace CompManager.Models.Accounts
 {
   public class AuthenticateResponse
   {

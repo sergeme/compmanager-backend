@@ -1,4 +1,4 @@
-namespace WebApi.Helpers
+namespace CompManager.Helpers
 {
   public class AppSettings
   {

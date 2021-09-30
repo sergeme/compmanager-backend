@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Entities;
+using CompManager.Entities;
 
-namespace WebApi.Controllers
+namespace CompManager.Controllers
 {
-    [Controller]
-    public abstract class BaseController : ControllerBase
-    {
-        // returns the current authenticated account (null if not logged in)
-        public Account Account => (Account)HttpContext.Items["Account"];
-    }
+  [Controller]
+  public abstract class BaseController : ControllerBase
+  {
+    // returns the current authenticated account (null if not logged in)
+    public Account Account => (Account)HttpContext.Items["Account"];
+  }
 }

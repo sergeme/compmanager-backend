@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using WebApi.Entities;
+using CompManager.Entities;
 
-namespace WebApi.Helpers
+namespace CompManager.Helpers
 {
   public class DataContext : DbContext
   {
@@ -16,15 +16,16 @@ namespace WebApi.Helpers
     public DbSet<Location> Locations { get; set; }
     public DbSet<Process> Processes { get; set; }
     public DbSet<ProcessType> ProcessTypes { get; set; }
+
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<Vocable> Vocables { get; set; }
-
     private readonly IConfiguration Configuration;
 
     public DataContext(IConfiguration configuration)
     {
       Configuration = configuration;
+
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)

@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using WebApi.Entities;
-using WebApi.Helpers;
-using WebApi.Models.Accounts;
-using WebApi.Services;
+using CompManager.Entities;
+using CompManager.Helpers;
+using CompManager.Models.Curricula;
+using CompManager.Services;
 
-namespace WebApi.Controllers
+namespace CompManager.Controllers
 {
   [ApiController]
   [Route("[controller]")]
@@ -29,10 +29,20 @@ namespace WebApi.Controllers
       _mapper = mapper;
     }
 
-    [HttpPost("")]
-    public ActionResult<AuthenticateResponse> Authenticate(AuthenticateRequest model)
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPost]
+    public ActionResult<CreateRequest> Create(CreateRequest model)
     {
-      return Ok();
+      var curriculum = _curriculumService.Create(model);
+      return Ok(curriculum);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpGet]
+    public ActionResult<CreateRequest> GetAll(CreateRequest model)
+    {
+      var curriculum = _curriculumService.GetAll();
+      return Ok(curriculum);
     }
   }
 }

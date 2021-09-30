@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace WebApi.Entities
+namespace CompManager.Entities
 {
   public class Class
   {
@@ -9,8 +9,6 @@ namespace WebApi.Entities
     public string Name { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-    public int DepartmentId { get; set; }
-    public Department Department { get; set; }
     public int CourseId { get; set; }
     public Course Course { get; set; }
     public int CurriculumId { get; set; }

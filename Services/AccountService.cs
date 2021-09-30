@@ -9,11 +9,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using WebApi.Entities;
-using WebApi.Helpers;
-using WebApi.Models.Accounts;
+using CompManager.Entities;
+using CompManager.Helpers;
+using CompManager.Models.Accounts;
 
-namespace WebApi.Services
+namespace CompManager.Services
 {
   public interface IAccountService
   {
