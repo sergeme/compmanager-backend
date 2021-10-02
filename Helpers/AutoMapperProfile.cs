@@ -83,6 +83,13 @@ namespace CompManager.Helpers
           }
         ));
 
+
+      CreateMap<CurriculumProcessType, Models.CurriculaProcessTypes.CurriculumProcessTypeResponse>();
+
+      CreateMap<Models.CurriculaProcessTypes.CreateRequest, CurriculumProcessType>();
+      //.ForMember(dst => dst.CurriculaId, opt => opt.MapFrom(src => src.CurriculumId));
+
+
       CreateMap<Curriculum, Models.Curricula.CurriculumResponse>();
 
       CreateMap<Models.Curricula.CreateRequest, Curriculum>();
@@ -95,6 +102,33 @@ namespace CompManager.Helpers
             return true;
           }
         ));
+
+      CreateMap<ProcessType, Models.ProcessTypes.ProcessTypeResponse>();
+
+      CreateMap<Models.ProcessTypes.CreateRequest, ProcessType>();
+
+      CreateMap<Models.ProcessTypes.UpdateRequest, ProcessType>()
+        .ForAllMembers(x => x.Condition(
+          (src, dest, prop) =>
+          {
+            if (prop == null) return false;
+            return true;
+          }
+        ));
+
+      CreateMap<Process, Models.Processes.ProcessResponse>();
+
+      CreateMap<Models.Processes.CreateRequest, Process>();
+
+      CreateMap<Models.Processes.UpdateRequest, Process>()
+        .ForAllMembers(x => x.Condition(
+          (src, dest, prop) =>
+          {
+            if (prop == null) return false;
+            return true;
+          }
+        ));
+
     }
   }
 }

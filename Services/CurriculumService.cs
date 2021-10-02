@@ -5,10 +5,12 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Newtonsoft.Json;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.Curricula;
@@ -59,7 +61,7 @@ namespace CompManager.Services
       {
         curriculum.ProcessTypes = _processTypeService.GetByCurriculum(curriculum.Id);
       }
-      return _mapper.Map<IList<CurriculumResponse>>(curricula);
+      return _mapper.Map<IList<CurriculumResponse>>(curriculaMapped);
     }
 
     public CurriculumResponse Update(int id, UpdateRequest model)

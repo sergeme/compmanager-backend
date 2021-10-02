@@ -7,7 +7,7 @@ namespace CompManager.Entities
   {
     public int Id { get; set; }
     public string Name { get; set; }
-    public ICollection<Curriculum> Curricula { get; set; }
+    public List<CurriculumProcessType> CurriculumProcessType { get; set; }
 #nullable enable    
     public List<Process>? Processes { get; set; }
     public int? CourseId { get; set; }

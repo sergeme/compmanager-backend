@@ -16,7 +16,7 @@ namespace CompManager.Helpers
     public DbSet<Location> Locations { get; set; }
     public DbSet<Process> Processes { get; set; }
     public DbSet<ProcessType> ProcessTypes { get; set; }
-
+    public DbSet<CurriculumProcessType> CurriculumProcessTypes { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<Vocable> Vocables { get; set; }
@@ -32,6 +32,23 @@ namespace CompManager.Helpers
     {
       // connect to sqlite database
       options.UseNpgsql(Configuration.GetConnectionString("CompManagerBackend"));
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      modelBuilder.Entity<CurriculumProcessType>()
+        .HasKey(t => new { t.CurriculaId, t.ProcessTypesId });
+
+      modelBuilder.Entity<CurriculumProcessType>()
+        .HasOne(cp => cp.Curriculum)
+        .WithMany(c => c.CurriculumProcessTypes)
+        .HasForeignKey(cp => cp.CurriculaId);
+
+      modelBuilder.Entity<CurriculumProcessType>()
+        .HasOne(cp => cp.ProcessType)
+        .WithMany(pt => pt.CurriculumProcessType)
+        .HasForeignKey(cp => cp.ProcessTypesId);
+
     }
   }
 }

@@ -6,25 +6,25 @@ using System;
 using System.Collections.Generic;
 using CompManager.Entities;
 using CompManager.Helpers;
-using CompManager.Models.Processes;
+using CompManager.Models.ProcessTypes;
 using CompManager.Services;
 
 namespace CompManager.Controllers
 {
   [ApiController]
   [Route("[controller]")]
-  public class ProcessesController : BaseController
+  public class ProcessTypesController : BaseController
   {
-    private readonly IProcessService _processService;
+    private readonly IProcessTypeService _processTypeService;
     private readonly IMapper _mapper;
     private readonly AppSettings _appSettings;
 
-    public ProcessesController(
-        IProcessService processService,
+    public ProcessTypesController(
+        IProcessTypeService processTypeService,
         IMapper mapper,
         IOptions<AppSettings> appSettings)
     {
-      _processService = processService;
+      _processTypeService = processTypeService;
       _appSettings = appSettings.Value;
       _mapper = mapper;
     }
@@ -33,16 +33,16 @@ namespace CompManager.Controllers
     [HttpPost]
     public ActionResult<CreateRequest> Create(CreateRequest model)
     {
-      var process = _processService.Create(model);
-      return Ok(process);
+      var processType = _processTypeService.Create(model);
+      return Ok(processType);
     }
 
     [Authorize(Role.ROLE_ADMIN)]
     [HttpGet]
     public ActionResult<CreateRequest> GetAll(CreateRequest model)
     {
-      var process = _processService.GetAll();
-      return Ok(process);
+      var processType = _processTypeService.GetAll();
+      return Ok(processType);
     }
   }
 }

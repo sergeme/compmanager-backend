@@ -12,14 +12,16 @@ using System.Text;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.ProcessTypes;
+using CompManager.Models.CurriculaProcessTypes;
 using Microsoft.EntityFrameworkCore;
 
 namespace CompManager.Services
 {
   public interface IProcessTypeService
   {
-    ProcessTypeResponse Create(CreateRequest model);
-    IEnumerable<ProcessTypeResponse> GetByCurriculum(int id);
+    ProcessTypeResponse Create(CompManager.Models.ProcessTypes.CreateRequest model);
+    IEnumerable<ProcessTypeResponse> GetByCurriculum(int curriculumId);
+    IEnumerable<ProcessTypeResponse> GetAll();
     ProcessTypeResponse Update(int id, UpdateRequest model);
     void Delete(int id);
   }
@@ -38,31 +40,46 @@ namespace CompManager.Services
       _appSettings = appSettings.Value;
       _processService = processService;
     }
-    public ProcessTypeResponse Create(CreateRequest model)
+    public ProcessTypeResponse Create(CompManager.Models.ProcessTypes.CreateRequest model)
     {
       // validate
       if (_context.ProcessTypes.Any(x => x.Name == model.Name))
         throw new AppException($"Prozesstyp '{model.Name}' besteht bereits");
 
       var processType = _mapper.Map<ProcessType>(model);
-
       _context.ProcessTypes.Add(processType);
       _context.SaveChanges();
 
+      var curriculum = _context.Curricula.Find(model.Curricula);
+
+      _context.CurriculumProcessTypes.Add(new CurriculumProcessType
+      {
+        Curriculum = curriculum,
+        ProcessType = processType
+      });
+      _context.SaveChanges();
       return _mapper.Map<ProcessTypeResponse>(processType);
     }
     public IEnumerable<ProcessTypeResponse> GetByCurriculum(int curriculumId)
     {
+      var curriculum = _context.Curricula
+      .Where(c => c.CurriculumProcessTypes
+      .Any(cpt => cpt.CurriculaId == c.Id))
+      .Include(c => c.Processes);
+
       var processTypes = _context.ProcessTypes
-        .Include(p => p.Curricula.Where(c => c.Id == curriculumId));
-      var processTypeMapped = _mapper.Map<IList<ProcessTypeResponse>>(processTypes);
-      foreach (ProcessTypeResponse processType in processTypeMapped)
-      {
-        processType.Processes = _processService.GetByProcessTypeAndCurriculum(processType.Id, curriculumId);
-      }
+      .Where(pt => pt.CurriculumProcessType
+      .Any(cpt => cpt.CurriculaId == curriculumId))
+      .Include(pt => pt.Processes);
+
       return _mapper.Map<IList<ProcessTypeResponse>>(processTypes);
     }
 
+    public IEnumerable<ProcessTypeResponse> GetAll()
+    {
+      var processTypes = _context.ProcessTypes;
+      return _mapper.Map<IList<ProcessTypeResponse>>(processTypes);
+    }
     public ProcessTypeResponse Update(int id, UpdateRequest model)
     {
       var processType = getProcessType(id);
