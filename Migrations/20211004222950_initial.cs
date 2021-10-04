@@ -139,12 +139,18 @@ namespace CompManager.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
+                    AccountId = table.Column<int>(type: "integer", nullable: false),
                     VocableId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tags", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tags_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tags_Vocables_VocableId",
                         column: x => x.VocableId,
@@ -183,6 +189,30 @@ namespace CompManager.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Classes_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CourseLocation",
+                columns: table => new
+                {
+                    CourseId = table.Column<int>(type: "integer", nullable: false),
+                    LocationId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CourseLocation", x => new { x.CourseId, x.LocationId });
+                    table.ForeignKey(
+                        name: "FK_CourseLocation_Courses_CourseId",
+                        column: x => x.CourseId,
+                        principalTable: "Courses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CourseLocation_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
                         principalColumn: "Id",
@@ -234,24 +264,24 @@ namespace CompManager.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CurriculumProcessTypes",
+                name: "CurriculumProcessType",
                 columns: table => new
                 {
-                    CurriculaId = table.Column<int>(type: "integer", nullable: false),
-                    ProcessTypesId = table.Column<int>(type: "integer", nullable: false)
+                    CurriculumId = table.Column<int>(type: "integer", nullable: false),
+                    ProcessTypeId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CurriculumProcessTypes", x => new { x.CurriculaId, x.ProcessTypesId });
+                    table.PrimaryKey("PK_CurriculumProcessType", x => new { x.CurriculumId, x.ProcessTypeId });
                     table.ForeignKey(
-                        name: "FK_CurriculumProcessTypes_Curricula_CurriculaId",
-                        column: x => x.CurriculaId,
+                        name: "FK_CurriculumProcessType_Curricula_CurriculumId",
+                        column: x => x.CurriculumId,
                         principalTable: "Curricula",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CurriculumProcessTypes_ProcessTypes_ProcessTypesId",
-                        column: x => x.ProcessTypesId,
+                        name: "FK_CurriculumProcessType_ProcessTypes_ProcessTypeId",
+                        column: x => x.ProcessTypeId,
                         principalTable: "ProcessTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -299,8 +329,7 @@ namespace CompManager.Migrations
                     Description = table.Column<string>(type: "text", nullable: true),
                     FinalResults = table.Column<string>(type: "text", nullable: true),
                     SuccessCriteria = table.Column<string>(type: "text", nullable: true),
-                    BasicKnowledge = table.Column<string>(type: "text", nullable: true),
-                    CompetenceType = table.Column<int>(type: "integer", nullable: false)
+                    BasicKnowledge = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -325,14 +354,20 @@ namespace CompManager.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Reviewer = table.Column<int>(type: "integer", nullable: false),
-                    Created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    AccountId = table.Column<int>(type: "integer", nullable: false),
+                    Changed = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CompetenceId = table.Column<int>(type: "integer", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_Competences_CompetenceId",
                         column: x => x.CompetenceId,
@@ -345,21 +380,21 @@ namespace CompManager.Migrations
                 name: "CompetenceTag",
                 columns: table => new
                 {
-                    CompetencesId = table.Column<int>(type: "integer", nullable: false),
-                    TagsId = table.Column<int>(type: "integer", nullable: false)
+                    CompetenceId = table.Column<int>(type: "integer", nullable: false),
+                    TagId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CompetenceTag", x => new { x.CompetencesId, x.TagsId });
+                    table.PrimaryKey("PK_CompetenceTag", x => new { x.CompetenceId, x.TagId });
                     table.ForeignKey(
-                        name: "FK_CompetenceTag_Competences_CompetencesId",
-                        column: x => x.CompetencesId,
+                        name: "FK_CompetenceTag_Competences_CompetenceId",
+                        column: x => x.CompetenceId,
                         principalTable: "Competences",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CompetenceTag_Tags_TagsId",
-                        column: x => x.TagsId,
+                        name: "FK_CompetenceTag_Tags_TagId",
+                        column: x => x.TagId,
                         principalTable: "Tags",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -372,11 +407,17 @@ namespace CompManager.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CompetenceId = table.Column<int>(type: "integer", nullable: false),
-                    Reviewer = table.Column<int>(type: "integer", nullable: false)
+                    AccountId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reviews", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reviews_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reviews_Competences_CompetenceId",
                         column: x => x.CompetenceId,
@@ -406,6 +447,11 @@ namespace CompManager.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_AccountId",
+                table: "Comments",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_CompetenceId",
                 table: "Comments",
                 column: "CompetenceId");
@@ -421,9 +467,14 @@ namespace CompManager.Migrations
                 column: "ProcessId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CompetenceTag_TagsId",
+                name: "IX_CompetenceTag_TagId",
                 table: "CompetenceTag",
-                column: "TagsId");
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CourseLocation_LocationId",
+                table: "CourseLocation",
+                column: "LocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Courses_DepartmentId",
@@ -431,9 +482,9 @@ namespace CompManager.Migrations
                 column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CurriculumProcessTypes_ProcessTypesId",
-                table: "CurriculumProcessTypes",
-                column: "ProcessTypesId");
+                name: "IX_CurriculumProcessType_ProcessTypeId",
+                table: "CurriculumProcessType",
+                column: "ProcessTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Processes_CurriculumId",
@@ -456,9 +507,19 @@ namespace CompManager.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reviews_AccountId",
+                table: "Reviews",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_CompetenceId",
                 table: "Reviews",
                 column: "CompetenceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_AccountId",
+                table: "Tags",
+                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tags_VocableId",
@@ -478,7 +539,10 @@ namespace CompManager.Migrations
                 name: "CompetenceTag");
 
             migrationBuilder.DropTable(
-                name: "CurriculumProcessTypes");
+                name: "CourseLocation");
+
+            migrationBuilder.DropTable(
+                name: "CurriculumProcessType");
 
             migrationBuilder.DropTable(
                 name: "RefreshToken");

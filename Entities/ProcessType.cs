@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace CompManager.Entities
 {
@@ -7,14 +7,13 @@ namespace CompManager.Entities
   {
     public int Id { get; set; }
     public string Name { get; set; }
-    public List<CurriculumProcessType> CurriculumProcessType { get; set; }
+    [JsonIgnore]
+    public ICollection<Curriculum> Curricula { get; set; }
 #nullable enable    
+    [JsonIgnore]
     public List<Process>? Processes { get; set; }
     public int? CourseId { get; set; }
     public Course? Course { get; set; }
 #nullable disable
-
-
-
   }
 }

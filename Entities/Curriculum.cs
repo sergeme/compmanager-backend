@@ -8,8 +8,7 @@ namespace CompManager.Entities
     public int Id { get; set; }
     public string Name { get; set; }
     public DateTime Created { get; set; }
-    public List<CurriculumProcessType> CurriculumProcessTypes { get; set; }
-    public List<Process> Processes { get; set; }
+    public ICollection<ProcessType> ProcessTypes { get; set; }
     public List<Class> Classes { get; set; }
   }
 }

@@ -1,8 +1,6 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using CompManager.Entities;
 using CompManager.Helpers;
@@ -62,11 +60,27 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("add-course")]
+    public ActionResult<DepartmentResponse> AddCourse(ChangeDepartmentCourseRequest model)
+    {
+      var department = _departmentService.AddCourse(model);
+      return Ok(department);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("remove-course")]
+    public ActionResult<DepartmentResponse> RemoveCourse(ChangeDepartmentCourseRequest model)
+    {
+      var department = _departmentService.RemoveCourse(model);
+      return Ok(department);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
     [HttpDelete("{id:int}")]
     public IActionResult Delete(int id)
     {
       _departmentService.Delete(id);
-      return Ok(new { message = "Standort gelöscht" });
+      return Ok(new { message = "Lehrplan erfolgreich gelöscht." });
     }
   }
 }

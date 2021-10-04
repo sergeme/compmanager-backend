@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using CompManager.Entities;
-
 namespace CompManager.Models.CurriculaProcessTypes
 {
   public class CreateRequest

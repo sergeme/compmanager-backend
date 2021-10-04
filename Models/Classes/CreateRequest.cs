@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using CompManager.Entities;
 using System;
-using System.Collections.Generic;
 
 namespace CompManager.Models.Classes
 {

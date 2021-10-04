@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace CompManager.Entities
 {
@@ -10,8 +8,8 @@ namespace CompManager.Entities
     public string Name { get; set; }
     public int DepartmentId { get; set; }
     public Department Department { get; set; }
-    public List<Class> Classes { get; set; }
-    public List<ProcessType> ProcessTypes { get; set; }
+    public ICollection<Location> Locations { get; set; }
+    public List<ProcessType> Processtypes { get; set; }
 
   }
 }

@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CompManager.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20211001174008_initial")]
+    [Migration("20211004222950_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -133,19 +133,21 @@ namespace CompManager.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Changed")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<int>("CompetenceId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Content")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("Reviewer")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("CompetenceId");
 
@@ -167,9 +169,6 @@ namespace CompManager.Migrations
 
                     b.Property<string>("BasicKnowledge")
                         .HasColumnType("text");
-
-                    b.Property<int>("CompetenceType")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Context")
                         .HasColumnType("text");
@@ -198,6 +197,21 @@ namespace CompManager.Migrations
                     b.ToTable("Competences");
                 });
 
+            modelBuilder.Entity("CompManager.Entities.CompetenceTag", b =>
+                {
+                    b.Property<int>("CompetenceId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CompetenceId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("CompetenceTag");
+                });
+
             modelBuilder.Entity("CompManager.Entities.Course", b =>
                 {
                     b.Property<int>("Id")
@@ -216,6 +230,21 @@ namespace CompManager.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("CompManager.Entities.CourseLocation", b =>
+                {
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CourseId", "LocationId");
+
+                    b.HasIndex("LocationId");
+
+                    b.ToTable("CourseLocation");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Curriculum", b =>
@@ -238,17 +267,17 @@ namespace CompManager.Migrations
 
             modelBuilder.Entity("CompManager.Entities.CurriculumProcessType", b =>
                 {
-                    b.Property<int>("CurriculaId")
+                    b.Property<int>("CurriculumId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ProcessTypesId")
+                    b.Property<int>("ProcessTypeId")
                         .HasColumnType("integer");
 
-                    b.HasKey("CurriculaId", "ProcessTypesId");
+                    b.HasKey("CurriculumId", "ProcessTypeId");
 
-                    b.HasIndex("ProcessTypesId");
+                    b.HasIndex("ProcessTypeId");
 
-                    b.ToTable("CurriculumProcessTypes");
+                    b.ToTable("CurriculumProcessType");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Department", b =>
@@ -336,13 +365,15 @@ namespace CompManager.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("CompetenceId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Reviewer")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("CompetenceId");
 
@@ -356,13 +387,15 @@ namespace CompManager.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("VocableId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("VocableId");
 
@@ -382,21 +415,6 @@ namespace CompManager.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Vocables");
-                });
-
-            modelBuilder.Entity("CompetenceTag", b =>
-                {
-                    b.Property<int>("CompetencesId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TagsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CompetencesId", "TagsId");
-
-                    b.HasIndex("TagsId");
-
-                    b.ToTable("CompetenceTag");
                 });
 
             modelBuilder.Entity("AccountClass", b =>
@@ -465,7 +483,7 @@ namespace CompManager.Migrations
             modelBuilder.Entity("CompManager.Entities.Class", b =>
                 {
                     b.HasOne("CompManager.Entities.Course", "Course")
-                        .WithMany("Classes")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -491,11 +509,19 @@ namespace CompManager.Migrations
 
             modelBuilder.Entity("CompManager.Entities.Comment", b =>
                 {
+                    b.HasOne("CompManager.Entities.Account", "Account")
+                        .WithMany("Comments")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CompManager.Entities.Competence", "Competence")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("CompetenceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Account");
 
                     b.Navigation("Competence");
                 });
@@ -519,6 +545,25 @@ namespace CompManager.Migrations
                     b.Navigation("Process");
                 });
 
+            modelBuilder.Entity("CompManager.Entities.CompetenceTag", b =>
+                {
+                    b.HasOne("CompManager.Entities.Competence", "Competence")
+                        .WithMany()
+                        .HasForeignKey("CompetenceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CompManager.Entities.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Competence");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("CompManager.Entities.Course", b =>
                 {
                     b.HasOne("CompManager.Entities.Department", "Department")
@@ -530,17 +575,36 @@ namespace CompManager.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("CompManager.Entities.CourseLocation", b =>
+                {
+                    b.HasOne("CompManager.Entities.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CompManager.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Location");
+                });
+
             modelBuilder.Entity("CompManager.Entities.CurriculumProcessType", b =>
                 {
                     b.HasOne("CompManager.Entities.Curriculum", "Curriculum")
-                        .WithMany("CurriculumProcessTypes")
-                        .HasForeignKey("CurriculaId")
+                        .WithMany()
+                        .HasForeignKey("CurriculumId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CompManager.Entities.ProcessType", "ProcessType")
-                        .WithMany("CurriculumProcessType")
-                        .HasForeignKey("ProcessTypesId")
+                        .WithMany()
+                        .HasForeignKey("ProcessTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -552,7 +616,7 @@ namespace CompManager.Migrations
             modelBuilder.Entity("CompManager.Entities.Process", b =>
                 {
                     b.HasOne("CompManager.Entities.Curriculum", "Curriculum")
-                        .WithMany("Processes")
+                        .WithMany()
                         .HasForeignKey("CurriculumId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -571,7 +635,7 @@ namespace CompManager.Migrations
             modelBuilder.Entity("CompManager.Entities.ProcessType", b =>
                 {
                     b.HasOne("CompManager.Entities.Course", "Course")
-                        .WithMany("ProcessTypes")
+                        .WithMany("Processtypes")
                         .HasForeignKey("CourseId");
 
                     b.Navigation("Course");
@@ -579,65 +643,68 @@ namespace CompManager.Migrations
 
             modelBuilder.Entity("CompManager.Entities.Review", b =>
                 {
+                    b.HasOne("CompManager.Entities.Account", "Account")
+                        .WithMany("Reviews")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CompManager.Entities.Competence", "Competence")
                         .WithMany("Reviews")
                         .HasForeignKey("CompetenceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Account");
+
                     b.Navigation("Competence");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Tag", b =>
                 {
+                    b.HasOne("CompManager.Entities.Account", "Account")
+                        .WithMany("Tags")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CompManager.Entities.Vocable", "Vocable")
                         .WithMany("Tags")
                         .HasForeignKey("VocableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Account");
+
                     b.Navigation("Vocable");
-                });
-
-            modelBuilder.Entity("CompetenceTag", b =>
-                {
-                    b.HasOne("CompManager.Entities.Competence", null)
-                        .WithMany()
-                        .HasForeignKey("CompetencesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CompManager.Entities.Tag", null)
-                        .WithMany()
-                        .HasForeignKey("TagsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("CompManager.Entities.Account", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Competences");
+
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Competence", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Course", b =>
                 {
-                    b.Navigation("Classes");
-
-                    b.Navigation("ProcessTypes");
+                    b.Navigation("Processtypes");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Curriculum", b =>
                 {
                     b.Navigation("Classes");
-
-                    b.Navigation("CurriculumProcessTypes");
-
-                    b.Navigation("Processes");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Department", b =>
@@ -652,8 +719,6 @@ namespace CompManager.Migrations
 
             modelBuilder.Entity("CompManager.Entities.ProcessType", b =>
                 {
-                    b.Navigation("CurriculumProcessType");
-
                     b.Navigation("Processes");
                 });
 

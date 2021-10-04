@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using CompManager.Entities;
 
 namespace CompManager.Models.Curricula
 {

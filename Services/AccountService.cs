@@ -127,7 +127,7 @@ namespace CompManager.Services
 
       // first registered account is an admin
       var isFirstAccount = _context.Accounts.Count() == 0;
-      account.Role = isFirstAccount ? Role.ROLE_ADMIN : Role.ROLE_STUDENT;
+      account.Role = isFirstAccount ? Role.ROLE_ADMIN & Role.ROLE_TEACHER & Role.ROLE_STUDENT : Role.ROLE_STUDENT;
       account.Created = DateTime.UtcNow;
       account.VerificationToken = randomTokenString();
 

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace CompManager.Entities
@@ -17,8 +16,8 @@ namespace CompManager.Entities
     public string FinalResults { get; set; }
     public string SuccessCriteria { get; set; }
     public string BasicKnowledge { get; set; }
-    public CompetenceType CompetenceType { get; set; }
     public List<Review> Reviews { get; set; }
+    public List<Comment> Comments { get; set; }
     public ICollection<Tag> Tags { get; set; }
 
   }

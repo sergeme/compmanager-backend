@@ -9,7 +9,7 @@ namespace CompManager.Models.Courses
     [Required]
     public string Name { get; set; }
 #nullable enable
-    public List<Course>? Courses { get; set; }
+    public List<Class>? Classes { get; set; }
 #nullable disable
   }
 }

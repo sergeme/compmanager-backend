@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using CompManager.Entities;
 
 namespace CompManager.Models.Locations
 {
@@ -7,5 +6,7 @@ namespace CompManager.Models.Locations
   {
     [Required]
     public string Name { get; set; }
+    [Required]
+    public int CourseId { get; set; }
   }
 }

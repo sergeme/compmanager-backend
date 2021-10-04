@@ -1,9 +1,6 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.ProcessTypes;
@@ -39,10 +36,26 @@ namespace CompManager.Controllers
 
     [Authorize(Role.ROLE_ADMIN)]
     [HttpGet]
-    public ActionResult<CreateRequest> GetAll(CreateRequest model)
+    public ActionResult<CreateRequest> GetAll()
     {
       var processType = _processTypeService.GetAll();
       return Ok(processType);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("{id:int}")]
+    public ActionResult<ProcessTypeResponse> Update(int id, UpdateRequest model)
+    {
+      var account = _processTypeService.Update(id, model);
+      return Ok(account);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete(int id)
+    {
+      _processTypeService.Delete(id);
+      return Ok(new { message = "Prozesstyp erfolgreich gelöscht." });
     }
   }
 }

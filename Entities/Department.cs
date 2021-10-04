@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace CompManager.Entities
 {
@@ -7,6 +7,7 @@ namespace CompManager.Entities
   {
     public int Id { get; set; }
     public string Name { get; set; }
+    [JsonIgnore]
     public List<Course> Courses { get; set; }
   }
 }

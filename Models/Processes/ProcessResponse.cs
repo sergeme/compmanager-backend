@@ -1,8 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using CompManager.Entities;
-using System.Collections.Generic;
-using CompManager.Models.Classes;
-
 namespace CompManager.Models.Processes
 {
   public class ProcessResponse

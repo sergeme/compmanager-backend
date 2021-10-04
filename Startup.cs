@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Converters;
 using System;
 using CompManager.Helpers;
 using CompManager.Middleware;
@@ -26,6 +25,7 @@ namespace CompManager
       services.AddCors();
       services.AddControllers().AddNewtonsoftJson(options =>
       {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
 
       });
@@ -41,6 +41,9 @@ namespace CompManager
       // configure DI for application services
       services.AddScoped<IAccountService, AccountService>();
       services.AddScoped<IClassService, ClassService>();
+      services.AddScoped<ITagService, TagService>();
+      services.AddScoped<ICommentService, CommentService>();
+      services.AddScoped<IReviewService, ReviewService>();
       services.AddScoped<ICompetenceService, CompetenceService>();
       services.AddScoped<ICourseService, CourseService>();
       services.AddScoped<ICurriculumService, CurriculumService>();

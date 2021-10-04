@@ -1,8 +1,6 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using CompManager.Entities;
 using CompManager.Helpers;
@@ -43,14 +41,6 @@ namespace CompManager.Controllers
     {
       var classes = _classService.GetAll();
       return Ok(classes);
-    }
-
-    [Authorize(Role.ROLE_ADMIN)]
-    [HttpGet("{id:int}")]
-    public ActionResult<IEnumerable<ClassResponse>> GetById(int id)
-    {
-      var classObj = _classService.GetById(id);
-      return Ok(classObj);
     }
 
     [Authorize(Role.ROLE_ADMIN)]

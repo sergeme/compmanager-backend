@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using CompManager.Entities;
-using System.Collections.Generic;
 
 namespace CompManager.Models.Curricula
 {
@@ -8,8 +6,5 @@ namespace CompManager.Models.Curricula
   {
     [Required]
     public string Name { get; set; }
-#nullable enable
-    public List<Course>? Courses { get; set; }
-#nullable disable
   }
 }

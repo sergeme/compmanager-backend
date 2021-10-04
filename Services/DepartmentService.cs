@@ -1,17 +1,11 @@
 using AutoMapper;
-using BC = BCrypt.Net.BCrypt;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.Departments;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompManager.Services
 {
@@ -20,8 +14,9 @@ namespace CompManager.Services
     DepartmentResponse Create(CreateRequest model);
     DepartmentResponse GetById(int id);
     IEnumerable<DepartmentResponse> GetAll();
-
     DepartmentResponse Update(int id, UpdateRequest model);
+    DepartmentResponse AddCourse(ChangeDepartmentCourseRequest model);
+    DepartmentResponse RemoveCourse(ChangeDepartmentCourseRequest model);
     void Delete(int id);
   }
 
@@ -53,22 +48,50 @@ namespace CompManager.Services
 
       return _mapper.Map<DepartmentResponse>(department);
     }
-    public DepartmentResponse GetById(int id)
-    {
-      var department = getDepartment(id);
-      var departmentMapped = _mapper.Map<DepartmentResponse>(department);
-      departmentMapped.Courses = _courseService.GetByDepartmentId(id);
-      return _mapper.Map<DepartmentResponse>(department);
-    }
     public IEnumerable<DepartmentResponse> GetAll()
     {
-      var departments = _context.Departments;
-      var departmentsMapped = _mapper.Map<IList<DepartmentResponse>>(departments);
-      foreach (DepartmentResponse department in departmentsMapped)
+      var departments = _context.Departments.Select(d => new Department
       {
-        department.Courses = _courseService.GetByDepartmentId(department.Id);
-      }
+        Id = d.Id,
+        Name = d.Name,
+        Courses = d.Courses.Select(c => new Course
+        {
+          Id = c.Id,
+          Name = c.Name,
+          Locations = c.Locations.Select(l => new Location
+          {
+            Id = l.Id,
+            Name = l.Name,
+            Classes = l.Classes.Where(cl => cl.CourseId == c.Id).ToList()
+          }).ToList()
+        }).ToList()
+      });
+
       return _mapper.Map<IList<DepartmentResponse>>(departments);
+    }
+
+    public DepartmentResponse GetById(int id)
+    {
+      var department = _context.Departments.Where(d => d.Id == id)
+      .Select(d => new Department
+      {
+        Id = d.Id,
+        Name = d.Name,
+        Courses = d.Courses.Select(c => new Course
+        {
+          Id = c.Id,
+          Name = c.Name,
+          Locations = c.Locations.Select(l => new Location
+          {
+            Id = l.Id,
+            Name = l.Name,
+            Classes = l.Classes.Where(cl => cl.CourseId == c.Id).ToList()
+          }).ToList()
+        }).ToList()
+      }).First();
+
+      return _mapper.Map<DepartmentResponse>(department);
+
     }
 
     public DepartmentResponse Update(int id, UpdateRequest model)
@@ -80,6 +103,40 @@ namespace CompManager.Services
       _context.SaveChanges();
 
       return _mapper.Map<DepartmentResponse>(department);
+    }
+
+    public DepartmentResponse AddCourse(ChangeDepartmentCourseRequest model)
+    {
+      var department = _context.Departments
+      .Include(d => d.Courses)
+      .Where(d => d.Id == model.DepartmentId).First();
+
+      var course = _courseService.GetCourse(model.CourseId);
+
+      department.Courses.Add(course);
+
+      _mapper.Map(model, department);
+      _context.Departments.Update(department);
+      _context.SaveChanges();
+
+      return _mapper.Map<DepartmentResponse>(GetById(model.DepartmentId));
+    }
+
+    public DepartmentResponse RemoveCourse(ChangeDepartmentCourseRequest model)
+    {
+      var department = _context.Departments
+      .Include(d => d.Courses)
+      .Where(d => d.Id == model.DepartmentId).First();
+
+      var course = _courseService.GetCourse(model.CourseId);
+
+      department.Courses.Remove(course);
+
+      _mapper.Map(model, department);
+      _context.Departments.Update(department);
+      _context.SaveChanges();
+
+      return _mapper.Map<DepartmentResponse>(GetById(model.DepartmentId));
     }
 
     public void Delete(int id)

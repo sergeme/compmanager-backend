@@ -1,17 +1,11 @@
 using AutoMapper;
-using BC = BCrypt.Net.BCrypt;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.Locations;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompManager.Services
 {
@@ -19,10 +13,10 @@ namespace CompManager.Services
   {
     LocationResponse Create(CreateRequest model);
     IEnumerable<LocationResponse> GetAll();
-    IEnumerable<LocationResponse> GetLocationsAndClassesByCourse(int courseId);
-
+    LocationResponse GetById(int id, int courseId);
     LocationResponse Update(int id, UpdateRequest model);
     void Delete(int id);
+    Location GetLocation(int id);
   }
 
   public class LocationService : ILocationService
@@ -45,8 +39,12 @@ namespace CompManager.Services
         throw new AppException($"Standort '{model.Name}' besteht bereits");
 
       var location = _mapper.Map<Location>(model);
-
       _context.Locations.Add(location);
+      _context.SaveChanges();
+
+      var newLocation = _context.Locations.Include(l => l.Courses).Single(l => l.Id == location.Id);
+      var course = _context.Courses.Single(c => c.Id == model.CourseId);
+      newLocation.Courses.Add(course);
       _context.SaveChanges();
 
       return _mapper.Map<LocationResponse>(location);
@@ -54,38 +52,45 @@ namespace CompManager.Services
 
     public IEnumerable<LocationResponse> GetAll()
     {
-      var locations = _context.Locations;
+      var locations = _context.Locations.Include(l => l.Classes);
       return _mapper.Map<IList<LocationResponse>>(locations);
     }
 
-    public IEnumerable<LocationResponse> GetLocationsAndClassesByCourse(int courseId)
+    public LocationResponse GetById(int id, int courseId)
     {
-      var locations = _context.Locations
-        .Where(l => l.Classes
-          .Any(c => c.CourseId == courseId));
+      var locations = _context.Locations.Where(l => l.Id == id)
+      .Select(l => new Location
+      {
+        Id = l.Id,
+        Name = l.Name,
+        Classes = l.Classes
+        .Where(c => c.CourseId == courseId)
+        .ToList()
+      }).First();
 
-      return _mapper.Map<IList<LocationResponse>>(locations);
+      return _mapper.Map<LocationResponse>(locations);
     }
 
     public LocationResponse Update(int id, UpdateRequest model)
     {
-      var location = getLocation(id);
+      var location = _context.Locations
+      .Include(l => l.Classes)
+      .Where(l => l.Id == id).First();
 
-      // copy model to account and save
       _mapper.Map(model, location);
       _context.Locations.Update(location);
       _context.SaveChanges();
 
-      return _mapper.Map<LocationResponse>(location);
+      return _mapper.Map<LocationResponse>(GetById(id, model.CourseId));
     }
 
     public void Delete(int id)
     {
-      var location = getLocation(id);
+      var location = GetLocation(id);
       _context.Locations.Remove(location);
       _context.SaveChanges();
     }
-    private Location getLocation(int id)
+    public Location GetLocation(int id)
     {
       var location = _context.Locations.Find(id);
       if (location == null) throw new KeyNotFoundException("Standort nicht gefunden");

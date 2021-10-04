@@ -1,9 +1,6 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.Curricula;
@@ -43,6 +40,46 @@ namespace CompManager.Controllers
     {
       var curriculum = _curriculumService.GetAll();
       return Ok(curriculum);
+    }
+
+    [Authorize(Role.ROLE_STUDENT, Role.ROLE_TEACHER, Role.ROLE_ADMIN)]
+    [HttpGet("{id:int}")]
+    public ActionResult<CurriculumResponse> GetById(int id)
+    {
+      var curriculum = _curriculumService.GetById(id);
+      return Ok(curriculum);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("{id:int}")]
+    public ActionResult<CurriculumResponse> Update(int id, UpdateRequest model)
+    {
+      var curriculum = _curriculumService.Update(id, model);
+      return Ok(curriculum);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("add-processtype")]
+    public ActionResult<CurriculumResponse> AddProcessType(ChangeCurriculumProcessTypeRequest model)
+    {
+      var curriculum = _curriculumService.AddProcessType(model);
+      return Ok(curriculum);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("remove-processtype")]
+    public ActionResult<CurriculumResponse> RemoveProcessType(ChangeCurriculumProcessTypeRequest model)
+    {
+      var curriculum = _curriculumService.RemoveProcessType(model);
+      return Ok(curriculum);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpDelete("{id:int}")]
+    public IActionResult Delete(int id)
+    {
+      _curriculumService.Delete(id);
+      return Ok(new { message = "Lehrplan erfolgreich gelöscht." });
     }
   }
 }

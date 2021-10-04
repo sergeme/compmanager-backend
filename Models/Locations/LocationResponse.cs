@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using CompManager.Entities;
 using System.Collections.Generic;
 using CompManager.Models.Classes;
 

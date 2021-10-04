@@ -1,8 +1,6 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using CompManager.Entities;
 using CompManager.Helpers;
@@ -51,6 +49,22 @@ namespace CompManager.Controllers
     {
       var course = _courseService.Update(id, model);
       return Ok(course);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("add-location")]
+    public ActionResult<CourseResponse> AddLocation(ChangeCourseLocationRequest model)
+    {
+      var curriculum = _courseService.AddLocation(model);
+      return Ok(curriculum);
+    }
+
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpPut("remove-location")]
+    public ActionResult<CourseResponse> RemoveLocation(ChangeCourseLocationRequest model)
+    {
+      var curriculum = _courseService.RemoveLocation(model);
+      return Ok(curriculum);
     }
 
     [Authorize(Role.ROLE_ADMIN)]

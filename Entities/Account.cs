@@ -23,6 +23,9 @@ namespace CompManager.Entities
     public List<RefreshToken> RefreshTokens { get; set; }
     public ICollection<Class> Classes { get; set; }
     public List<Competence> Competences { get; set; }
+    public List<Tag> Tags { get; set; }
+    public List<Review> Reviews { get; set; }
+    public List<Comment> Comments { get; set; }
     public CompetenceType CompetenceType { get; set; } //decides which editor is being used
 
     public bool OwnsToken(string token)

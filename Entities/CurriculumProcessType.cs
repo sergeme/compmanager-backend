@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-
 namespace CompManager.Entities
 {
   public class CurriculumProcessType
   {
-    public int CurriculaId { get; set; }
-    public Curriculum Curriculum { get; set; }
-    public int ProcessTypesId { get; set; }
-    public ProcessType ProcessType { get; set; }
+    public int CurriculumId { get; set; }
+    public int ProcessTypeId { get; set; }
+
+    public Curriculum Curriculum { get; private set; }
+    public ProcessType ProcessType { get; private set; }
   }
 }
