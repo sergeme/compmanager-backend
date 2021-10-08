@@ -7,7 +7,7 @@ namespace CompManager.Models.Competences
     public string FirstName { get; set; }
     public string LastName { get; set; }
 #nullable enable
-    public IEnumerable<CompetenceResponse>? Competences { get; set; }
+    public IEnumerable<CompetenceForTeacherResponse>? Competences { get; set; }
 #nullable disable
   }
 }

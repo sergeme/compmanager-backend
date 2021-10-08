@@ -44,10 +44,10 @@ namespace CompManager.Controllers
     }
 
     [Authorize]
-    [HttpPut("{id:int}")]
-    public ActionResult<LocationResponse> Update(int id, UpdateRequest model)
+    [HttpPut]
+    public ActionResult<LocationResponse> Update(UpdateRequest model)
     {
-      var location = _locationService.Update(id, model);
+      var location = _locationService.Update(model);
       return Ok(location);
     }
 

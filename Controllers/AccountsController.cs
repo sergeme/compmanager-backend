@@ -68,35 +68,35 @@ namespace CompManager.Controllers
     public IActionResult Register(RegisterRequest model)
     {
       _accountService.Register(model, _appSettings.FrontendBaseUrl);
-      return Ok(new { message = "Registration successful, please check your email for verification instructions" });
+      return Ok(new { message = "Registration erfolgreich, prüfe bitte deinen Posteingang und bestätige die Registrierung." });
     }
 
     [HttpPost("verify-email")]
     public IActionResult VerifyEmail(VerifyEmailRequest model)
     {
       _accountService.VerifyEmail(model.Token);
-      return Ok(new { message = "Verification successful, you can now login" });
+      return Ok(new { message = "Erfolgreich verifiziert, du kannst dich nun anmelden." });
     }
 
     [HttpPost("forgot-password")]
     public IActionResult ForgotPassword(ForgotPasswordRequest model)
     {
       _accountService.ForgotPassword(model, Request.Headers["origin"]);
-      return Ok(new { message = "Please check your email for password reset instructions" });
+      return Ok(new { message = "E-Mail verschickt, prüfe bitte deinen Posteingang um weitere Instruktionen zu erhalten." });
     }
 
     [HttpPost("validate-reset-token")]
     public IActionResult ValidateResetToken(ValidateResetTokenRequest model)
     {
       _accountService.ValidateResetToken(model);
-      return Ok(new { message = "Token is valid" });
+      return Ok(new { message = "Token ist gültig" });
     }
 
     [HttpPost("reset-password")]
     public IActionResult ResetPassword(ResetPasswordRequest model)
     {
       _accountService.ResetPassword(model);
-      return Ok(new { message = "Password reset successful, you can now login" });
+      return Ok(new { message = "Passwort erfolgreich zurückgesetzt, du kannst dich nun anmelden." });
     }
 
     [Authorize(Role.ROLE_ADMIN)]
@@ -152,7 +152,7 @@ namespace CompManager.Controllers
         return Unauthorized(new { message = "Unauthorized" });
 
       _accountService.Delete(id);
-      return Ok(new { message = "Account deleted successfully" });
+      return Ok(new { message = "Account erfolgreich gelöscht." });
     }
 
     // helper methods

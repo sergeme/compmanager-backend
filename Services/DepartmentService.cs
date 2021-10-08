@@ -14,7 +14,7 @@ namespace CompManager.Services
     DepartmentResponse Create(CreateRequest model);
     DepartmentResponse GetById(int id);
     IEnumerable<DepartmentResponse> GetAll();
-    DepartmentResponse Update(int id, UpdateRequest model);
+    DepartmentResponse Update(UpdateRequest model);
     DepartmentResponse AddCourse(ChangeDepartmentCourseRequest model);
     DepartmentResponse RemoveCourse(ChangeDepartmentCourseRequest model);
     void Delete(int id);
@@ -94,9 +94,9 @@ namespace CompManager.Services
 
     }
 
-    public DepartmentResponse Update(int id, UpdateRequest model)
+    public DepartmentResponse Update(UpdateRequest model)
     {
-      var department = getDepartment(id);
+      var department = getDepartment(model.Id);
 
       _mapper.Map(model, department);
       _context.Departments.Update(department);

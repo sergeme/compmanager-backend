@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using CompManager.Entities;
 using CompManager.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +25,7 @@ namespace CompManager.Services
     CompetenceResponse AddComment(CompManager.Models.Comments.CreateRequest model);
     CompetenceResponse UpdateComment(CompManager.Models.Comments.UpdateRequest model);
     IEnumerable<CompetencesToReviewResponse> AddCommentByTeacher(CompManager.Models.Comments.CreateRequest model, int accountId);
-    CompetenceResponse RemoveComment(ChangeCompetenceCommentRequest model);
+    CompetenceResponse RemoveComment(RemoveCompetenceCommentRequest model);
     IEnumerable<CompetenceResponse> Delete(int competenceId, int accountId);
   }
 
@@ -66,34 +67,10 @@ namespace CompManager.Services
     public IEnumerable<CompetenceResponse> GetByAccount(int accountId)
     {
       var competences = _context.Competences.Where(c => c.AccountId == accountId)
-      .Select(comp => new Competence
-      {
-        Id = comp.Id,
-        Name = comp.Name,
-        Action = comp.Action,
-        Context = comp.Context,
-        Description = comp.Description,
-        FinalResults = comp.FinalResults,
-        SuccessCriteria = comp.SuccessCriteria,
-        BasicKnowledge = comp.BasicKnowledge,
-        Reviews = comp.Reviews.Select(r => new Review
-        {
-          Id = r.Id,
-          Account = r.Account
-        }).ToList(),
-        Comments = comp.Comments.Select(c => new Comment
-        {
-          Id = c.Id,
-          Changed = c.Changed,
-          Account = c.Account,
-          Content = c.Content
-        }).ToList(),
-        Tags = comp.Tags.Select(t => new Tag
-        {
-          Id = t.Id,
-          Vocable = t.Vocable
-        }).ToList()
-      });
+      .Include(c => c.Reviews)
+      .Include(c => c.Comments)
+      .Include(c => c.Tags)
+      .ThenInclude(t => t.Vocable);
       return _mapper.Map<IList<CompetenceResponse>>(competences);
     }
 
@@ -119,41 +96,15 @@ namespace CompManager.Services
         }).ToList()
       }).ToList();
 
+      Console.WriteLine((competences[0].Competences[0].Reviews == null));
+
       return _mapper.Map<IList<CompetencesToReviewResponse>>(competences);
     }
 
     public CompetenceResponse GetById(int competenceId, int accountId)
     {
-      var competences = _context.Competences.Where(c => c.AccountId == accountId && c.Id == competenceId)
-      .Select(comp => new Competence
-      {
-        Id = comp.Id,
-        Name = comp.Name,
-        Action = comp.Action,
-        Context = comp.Context,
-        Description = comp.Description,
-        FinalResults = comp.FinalResults,
-        SuccessCriteria = comp.SuccessCriteria,
-        BasicKnowledge = comp.BasicKnowledge,
-        Reviews = comp.Reviews.Select(r => new Review
-        {
-          Id = r.Id,
-          Account = r.Account
-        }).ToList(),
-        Comments = comp.Comments.Select(c => new Comment
-        {
-          Id = c.Id,
-          Changed = c.Changed,
-          Account = c.Account,
-          Content = c.Content
-        }).ToList(),
-        Tags = comp.Tags.Select(t => new Tag
-        {
-          Id = t.Id,
-          Vocable = t.Vocable
-        }).ToList()
-      }).First();
-      return _mapper.Map<CompetenceResponse>(competences);
+      var competence = GetCompetence(competenceId, accountId);
+      return _mapper.Map<CompetenceResponse>(competence);
     }
     public CompetenceResponse Update(int competenceId, UpdateRequest model)
     {
@@ -172,9 +123,18 @@ namespace CompManager.Services
 
     public CompetenceResponse AddTag(CompManager.Models.Tags.CreateRequest model)
     {
-      _tagService.Create(model);
+      Tag tag = _tagService.Create(model);
+      Competence competence = GetCompetence(model.CompetenceId, model.AccountId);
 
-      return _mapper.Map<CompetenceResponse>(GetById(model.CompetenceId, model.AccountId));
+      competence.Tags.Add(tag);
+      foreach (var t in competence.Tags)
+      {
+
+        Console.WriteLine(t.Vocable.Name);
+      }
+      _context.SaveChanges();
+
+      return _mapper.Map<CompetenceResponse>(competence);
     }
 
     public CompetenceResponse RemoveTag(ChangeCompetenceTagRequest model)
@@ -229,8 +189,12 @@ namespace CompManager.Services
     {
       Comment comment = _context.Comments.Find(model.Id);
       _mapper.Map(model, comment);
-      _context.Comments.Update(comment);
+
+      Competence competence = _context.Competences.Find(model.CompetenceId);
+      _context.Competences.Update(competence);
+      competence.Comments.Find(c => { return c.Id == model.Id; }).Content = model.Content;
       _context.SaveChanges();
+
 
       return _mapper.Map<CompetenceResponse>(GetById(model.CompetenceId, model.AccountId));
     }
@@ -246,7 +210,7 @@ namespace CompManager.Services
       return _mapper.Map<IList<CompetencesToReviewResponse>>(GetByTeacher(accountId));
     }
 
-    public CompetenceResponse RemoveComment(ChangeCompetenceCommentRequest model)
+    public CompetenceResponse RemoveComment(RemoveCompetenceCommentRequest model)
     {
       Competence competence = GetCompetence(model.CompetenceId, model.AccountId);
       Comment comment = _commentService.GetComment(model.CommentId);
@@ -272,9 +236,10 @@ namespace CompManager.Services
     private Competence GetCompetence(int id, int accountId)
     {
       Competence competence = _context.Competences
-      .Include(c => c.Reviews)
-      .Include(c => c.Comments)
-      .Include(c => c.Tags)
+      .Include(c => c.Reviews.OrderBy(review => review.Id))
+      .Include(c => c.Comments.OrderBy(comment => comment.Id))
+      .Include(c => c.Tags.OrderBy(tag => tag.Id))
+      .ThenInclude(t => t.Vocable)
       .Where(c => c.Id == id && c.AccountId == accountId).First();
 
       if (competence == null) throw new KeyNotFoundException("Kompetenz nicht gefunden");

@@ -43,6 +43,14 @@ namespace CompManager.Controllers
       return Ok(competence);
     }
 
+    [Authorize(Role.ROLE_STUDENT)]
+    [HttpGet("{id:int}")]
+    public ActionResult<IEnumerable<CompetenceResponse>> GetById(int id)
+    {
+      var competence = _competenceService.GetById(id, Account.Id);
+      return Ok(competence);
+    }
+
     [Authorize(Role.ROLE_TEACHER)]
     [HttpGet("to-review")]
     public ActionResult<IEnumerable<CompetencesToReviewResponse>> GetByTeacher()
@@ -114,7 +122,7 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_STUDENT)]
-    [HttpPatch("add-comment")]
+    [HttpPost("add-comment")]
     public ActionResult<CompetenceResponse> AddComment(CompManager.Models.Comments.CreateRequest model)
     {
       if (model.AccountId != Account.Id)
@@ -136,7 +144,7 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_TEACHER)]
-    [HttpPatch("add-comment-by-teacher")]
+    [HttpPost("add-comment-by-teacher")]
     public ActionResult<CompetenceResponse> AddCommentByTeacher(CompManager.Models.Comments.CreateRequest model)
     {
       if (model.AccountId != Account.Id)
@@ -147,8 +155,8 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_STUDENT)]
-    [HttpPatch("remove-comment")]
-    public ActionResult<CompetenceResponse> RemoveComment(ChangeCompetenceCommentRequest model)
+    [HttpDelete("remove-comment")]
+    public ActionResult<CompetenceResponse> RemoveComment(RemoveCompetenceCommentRequest model)
     {
       if (model.AccountId != Account.Id)
         return Unauthorized(new { message = "Unauthorized" });

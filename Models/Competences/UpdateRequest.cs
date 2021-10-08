@@ -5,11 +5,10 @@ namespace CompManager.Models.Competences
   public class UpdateRequest
   {
     [Required]
-    public string Name { get; set; }
-    [Required]
     public int ProcessId { get; set; }
     [Required]
     public int AccountId { get; set; }
+    public string Name { get; set; }
     public string Action { get; set; }
     public string Context { get; set; }
     public string Description { get; set; }

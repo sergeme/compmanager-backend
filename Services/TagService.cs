@@ -33,7 +33,7 @@ namespace CompManager.Services
     public Tag Create(CreateRequest model)
     {
 
-      Vocable vocable = GetExistingVocable(model.Vocable);
+      Vocable vocable = GetExistingVocable(model);
       Tag tag = GetExistingTag(model, vocable.Id);
       vocable.Tags.Add(tag);
       _context.SaveChanges();
@@ -72,13 +72,13 @@ namespace CompManager.Services
       return tag;
     }
 
-    private Vocable GetExistingVocable(string name)
+    private Vocable GetExistingVocable(CreateRequest model)
     {
       Vocable vocable;
-      Vocable existingVocable = _context.Vocables.Include(v => v.Tags).SingleOrDefault(v => v.Name == name);
+      Vocable existingVocable = _context.Vocables.Include(v => v.Tags).SingleOrDefault(v => v.Name == model.Name);
       if (existingVocable == null)
       {
-        vocable = _mapper.Map<Vocable>(name);
+        vocable = _mapper.Map<Vocable>(model);
         _context.Vocables.Add(vocable);
         _context.SaveChanges();
       }

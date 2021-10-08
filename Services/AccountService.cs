@@ -56,7 +56,7 @@ namespace CompManager.Services
       var account = _context.Accounts.SingleOrDefault(x => x.Email == model.Email);
 
       if (account == null || !account.IsVerified || !BC.Verify(model.Password, account.PasswordHash))
-        throw new AppException("Email or password is incorrect");
+        throw new AppException("E-Mail oder Passwort fehlerhaft");
 
       // authentication successful so generate jwt and refresh tokens
       var jwtToken = generateJwtToken(account);
@@ -127,7 +127,7 @@ namespace CompManager.Services
 
       // first registered account is an admin
       var isFirstAccount = _context.Accounts.Count() == 0;
-      account.Role = isFirstAccount ? Role.ROLE_ADMIN & Role.ROLE_TEACHER & Role.ROLE_STUDENT : Role.ROLE_STUDENT;
+      account.Role = isFirstAccount ? Role.ROLE_ADMIN ^ Role.ROLE_TEACHER ^ Role.ROLE_STUDENT : Role.ROLE_STUDENT;
       account.Created = DateTime.UtcNow;
       account.VerificationToken = randomTokenString();
 
@@ -146,7 +146,7 @@ namespace CompManager.Services
     {
       var account = _context.Accounts.SingleOrDefault(x => x.VerificationToken == token);
 
-      if (account == null) throw new AppException("Verification failed");
+      if (account == null) throw new AppException("Verifikation fehlgeschlagen");
 
       account.Verified = DateTime.UtcNow;
       account.VerificationToken = null;
@@ -180,7 +180,7 @@ namespace CompManager.Services
           x.ResetTokenExpires > DateTime.UtcNow);
 
       if (account == null)
-        throw new AppException("Invalid token");
+        throw new AppException("Ungültiger Token");
     }
 
     public void ResetPassword(ResetPasswordRequest model)
@@ -190,7 +190,7 @@ namespace CompManager.Services
           x.ResetTokenExpires > DateTime.UtcNow);
 
       if (account == null)
-        throw new AppException("Invalid token");
+        throw new AppException("Ungültiger Token");
 
       // update password and remove reset token
       account.PasswordHash = BC.HashPassword(model.Password);
@@ -218,7 +218,7 @@ namespace CompManager.Services
     {
       // validate
       if (_context.Accounts.Any(x => x.Email == model.Email))
-        throw new AppException($"Email '{model.Email}' is already registered");
+        throw new AppException($"E-Mail '{model.Email}' ist bereits registriert");
 
       // map model to new account object
       var account = _mapper.Map<Account>(model);
@@ -275,9 +275,9 @@ namespace CompManager.Services
     private (RefreshToken, Account) getRefreshToken(string token)
     {
       var account = _context.Accounts.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
-      if (account == null) throw new AppException("Invalid token");
+      if (account == null) throw new AppException("Ungültiger Token");
       var refreshToken = account.RefreshTokens.Single(x => x.Token == token);
-      if (!refreshToken.IsActive) throw new AppException("Invalid token");
+      if (!refreshToken.IsActive) throw new AppException("Ungültiger Token");
       return (refreshToken, account);
     }
 
@@ -325,64 +325,45 @@ namespace CompManager.Services
     private void sendVerificationEmail(Account account, string origin)
     {
       string message;
-      if (!string.IsNullOrEmpty(origin))
-      {
-        var verifyUrl = $"{origin}/verify/{account.VerificationToken}";
-        message = $@"<p>Please click the below link to verify your email address:</p>
-                             <p><a href=""{verifyUrl}"">{verifyUrl}</a></p>";
-      }
-      else
-      {
-        message = $@"<p>Please use the below token to verify your email address with the <code>/accounts/verify-email</code> api route:</p>
-                             <p><code>{account.VerificationToken}</code></p>";
-      }
+      var verifyUrl = $"{origin}/verify/{account.VerificationToken}";
+      message = $@"<p>Bitte klicke auf den untenstehenden Link um die Registration abzuschliessen:</p>
+        <p><a href=""{verifyUrl}"">{verifyUrl}</a></p>";
 
       _emailService.Send(
-          to: account.Email,
-          subject: "Sign-up Verification API - Verify Email",
-          html: $@"<h4>Verify Email</h4>
-                         <p>Thanks for registering!</p>
-                         {message}"
+        to: account.Email,
+        subject: "Kompetenz-Manager - E-Mail verifizieren",
+        html: $@"<h4>E-Mail verifizieren</h4>
+          <p>Danke fürs registrieren!</p>
+          {message}"
       );
     }
 
     private void sendAlreadyRegisteredEmail(string email, string origin)
     {
-      string message;
-      if (!string.IsNullOrEmpty(origin))
-        message = $@"<p>If you don't know your password please visit the <a href=""{origin}/account/forgot-password"">forgot password</a> page.</p>";
-      else
-        message = "<p>If you don't know your password you can reset it via the <code>/accounts/forgot-password</code> api route.</p>";
+      var forgotPasswordUrl = $"{origin}/forgot-password";
+      string message = $@"<p>Falls du dein Passwort vergessen hast, besuche die <a href=""{forgotPasswordUrl}"">Passwort vergessen</a> page.</p>";
+
 
       _emailService.Send(
           to: email,
-          subject: "Sign-up Verification API - Email Already Registered",
-          html: $@"<h4>Email Already Registered</h4>
-                         <p>Your email <strong>{email}</strong> is already registered.</p>
-                         {message}"
+          subject: "Kompetenz-Manager - E-Mail bereits registriert",
+          html: $@"<h4>E-Mail bereits registriert</h4>
+            <p>Deine E-Mailadresse <strong>{email}</strong> ist bereits registriert.</p>
+            {message}"
       );
     }
 
     private void sendPasswordResetEmail(Account account, string origin)
     {
-      string message;
-      if (!string.IsNullOrEmpty(origin))
-      {
-        var resetUrl = $"{origin}/account/reset-password?token={account.ResetToken}";
-        message = $@"<p>Please click the below link to reset your password, the link will be valid for 1 day:</p>
-                             <p><a href=""{resetUrl}"">{resetUrl}</a></p>";
-      }
-      else
-      {
-        message = $@"<p>Please use the below token to reset your password with the <code>/accounts/reset-password</code> api route:</p>
-                             <p><code>{account.ResetToken}</code></p>";
-      }
+      var resetUrl = $"{origin}/reset-password/{account.ResetToken}";
+      string message = $@"<p>Bitte klicke auf untenstehenden Link, um dein Passwort zurückzusetzen, er ist für 24 Stunden gültig:</p>
+        <p><a href=""{resetUrl}"">{resetUrl}</a></p>";
 
       _emailService.Send(
-          to: account.Email,
-          subject: "Sign-up Verification API - Reset Password",
-          html: $@"<h4>Reset Password Email</h4>
-                         {message}"
+      to: account.Email,
+          subject: "Kompetenz-Manager - Passwort zurücksetzen",
+          html: $@"<h4>Passwort zurücksetzen</h4>
+          {message}"
       );
     }
   }

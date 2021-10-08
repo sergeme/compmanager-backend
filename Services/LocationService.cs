@@ -14,7 +14,7 @@ namespace CompManager.Services
     LocationResponse Create(CreateRequest model);
     IEnumerable<LocationResponse> GetAll();
     LocationResponse GetById(int id, int courseId);
-    LocationResponse Update(int id, UpdateRequest model);
+    LocationResponse Update(UpdateRequest model);
     void Delete(int id);
     Location GetLocation(int id);
   }
@@ -71,17 +71,17 @@ namespace CompManager.Services
       return _mapper.Map<LocationResponse>(locations);
     }
 
-    public LocationResponse Update(int id, UpdateRequest model)
+    public LocationResponse Update(UpdateRequest model)
     {
       var location = _context.Locations
       .Include(l => l.Classes)
-      .Where(l => l.Id == id).First();
+      .Where(l => l.Id == model.Id).First();
 
       _mapper.Map(model, location);
       _context.Locations.Update(location);
       _context.SaveChanges();
 
-      return _mapper.Map<LocationResponse>(GetById(id, model.CourseId));
+      return _mapper.Map<LocationResponse>(GetLocation(model.Id));
     }
 
     public void Delete(int id)

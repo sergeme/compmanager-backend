@@ -43,11 +43,19 @@ namespace CompManager.Controllers
       return Ok(courses);
     }
 
-    [Authorize]
-    [HttpPut("{id:int}")]
-    public ActionResult<CourseResponse> Update(int id, UpdateRequest model)
+    [Authorize(Role.ROLE_ADMIN)]
+    [HttpGet("{id:int}")]
+    public ActionResult<IEnumerable<CourseResponse>> GetById(int id)
     {
-      var course = _courseService.Update(id, model);
+      var courses = _courseService.GetById(id);
+      return Ok(courses);
+    }
+
+    [Authorize]
+    [HttpPut]
+    public ActionResult<CourseResponse> Update(UpdateRequest model)
+    {
+      var course = _courseService.Update(model);
       return Ok(course);
     }
 

@@ -52,10 +52,10 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_ADMIN)]
-    [HttpPut("{id:int}")]
-    public ActionResult<DepartmentResponse> Update(int id, UpdateRequest model)
+    [HttpPut]
+    public ActionResult<DepartmentResponse> Update(UpdateRequest model)
     {
-      var department = _departmentService.Update(id, model);
+      var department = _departmentService.Update(model);
       return Ok(department);
     }
 

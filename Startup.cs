@@ -6,6 +6,7 @@ using System;
 using CompManager.Helpers;
 using CompManager.Middleware;
 using CompManager.Services;
+using CompManager.Entities;
 
 namespace CompManager
 {

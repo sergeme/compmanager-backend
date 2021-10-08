@@ -14,9 +14,9 @@ namespace CompManager.Services
     CourseResponse Create(CreateRequest model);
     IEnumerable<CourseResponse> GetAll();
     CourseResponse GetById(int id);
-    CourseResponse Update(int id, UpdateRequest model);
-    CourseResponse AddLocation(ChangeCourseLocationRequest model);
-    CourseResponse RemoveLocation(ChangeCourseLocationRequest model);
+    CourseResponse Update(UpdateRequest model);
+    CompManager.Models.Locations.LocationResponse AddLocation(ChangeCourseLocationRequest model);
+    CompManager.Models.Locations.LocationResponse RemoveLocation(ChangeCourseLocationRequest model);
     Course GetCourse(int id);
     void Delete(int id);
   }
@@ -84,20 +84,20 @@ namespace CompManager.Services
       return _mapper.Map<CourseResponse>(course);
     }
 
-    public CourseResponse Update(int id, UpdateRequest model)
+    public CourseResponse Update(UpdateRequest model)
     {
       var course = _context.Courses
       .Include(c => c.Locations)
-      .Where(c => c.Id == id).First();
+      .Where(c => c.Id == model.Id).First();
 
       _mapper.Map(model, course);
       _context.Courses.Update(course);
       _context.SaveChanges();
 
-      return _mapper.Map<CourseResponse>(GetById(id));
+      return _mapper.Map<CourseResponse>(GetById(model.Id));
     }
 
-    public CourseResponse AddLocation(ChangeCourseLocationRequest model)
+    public CompManager.Models.Locations.LocationResponse AddLocation(ChangeCourseLocationRequest model)
     {
       var course = _context.Courses
       .Include(c => c.Locations)
@@ -111,10 +111,10 @@ namespace CompManager.Services
       _context.Courses.Update(course);
       _context.SaveChanges();
 
-      return _mapper.Map<CourseResponse>(GetById(model.CourseId));
+      return _mapper.Map<CompManager.Models.Locations.LocationResponse>(location);
     }
 
-    public CourseResponse RemoveLocation(ChangeCourseLocationRequest model)
+    public CompManager.Models.Locations.LocationResponse RemoveLocation(ChangeCourseLocationRequest model)
     {
       var course = _context.Courses
       .Include(c => c.Locations)
@@ -128,7 +128,7 @@ namespace CompManager.Services
       _context.Courses.Update(course);
       _context.SaveChanges();
 
-      return _mapper.Map<CourseResponse>(GetById(model.CourseId));
+      return _mapper.Map<CompManager.Models.Locations.LocationResponse>(location);
     }
 
     public void Delete(int id)

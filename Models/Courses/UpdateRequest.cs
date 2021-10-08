@@ -7,9 +7,8 @@ namespace CompManager.Models.Courses
   public class UpdateRequest
   {
     [Required]
+    public int Id { get; set; }
+    [Required]
     public string Name { get; set; }
-#nullable enable
-    public List<Class>? Classes { get; set; }
-#nullable disable
   }
 }

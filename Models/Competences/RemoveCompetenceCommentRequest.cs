@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CompManager.Models.Competences
 {
-  public class ChangeCompetenceCommentRequest
+  public class RemoveCompetenceCommentRequest
   {
     [Required]
     public int AccountId { get; set; }

@@ -5,8 +5,8 @@ namespace CompManager.Models.Locations
   public class UpdateRequest
   {
     [Required]
-    public string Name { get; set; }
+    public int Id { get; set; }
     [Required]
-    public int CourseId { get; set; }
+    public string Name { get; set; }
   }
 }

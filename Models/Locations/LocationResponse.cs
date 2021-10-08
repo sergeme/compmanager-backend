@@ -7,8 +7,5 @@ namespace CompManager.Models.Locations
   {
     public int Id { get; set; }
     public string Name { get; set; }
-#nullable enable
-    public IEnumerable<ClassResponse>? Classes { get; set; }
-#nullable disable
   }
 }

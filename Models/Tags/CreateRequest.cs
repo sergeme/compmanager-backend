@@ -9,6 +9,6 @@ namespace CompManager.Models.Tags
     [Required]
     public int CompetenceId { get; set; }
     [Required]
-    public string Vocable { get; set; }
+    public string Name { get; set; }
   }
 }
