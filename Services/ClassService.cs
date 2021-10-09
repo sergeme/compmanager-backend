@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using CompManager.Entities;
@@ -12,9 +13,11 @@ namespace CompManager.Services
   {
     ClassResponse Create(CreateRequest model);
     IEnumerable<ClassResponse> GetAll();
-    IEnumerable<ClassResponse> GetByLocationAndCourse(int locationId, int courseId);
-    ClassResponse Update(int id, UpdateRequest model);
-    IEnumerable<ClassResponse> Delete(int id);
+    IEnumerable<ClassResponse> GetByLocationAndCourse(ClassesByLocationAndCourseRequest model);
+    ClassResponse Update(UpdateRequest model);
+    void Delete(int id);
+    ClassResponse AddStudent(ChangeClassStudentRequest model);
+    ClassResponse RemoveStudent(ChangeClassStudentRequest model);
   }
 
   public class ClassService : IClassService
@@ -43,22 +46,56 @@ namespace CompManager.Services
       return _mapper.Map<ClassResponse>(classObj);
     }
 
+
+    public ClassResponse AddStudent(ChangeClassStudentRequest model)
+    {
+      Class classObj = _context.Classes.Include(cl => cl.Accounts)
+      .Where(cl => cl.Id == model.Id)
+      .First();
+
+      Account student = _context.Accounts
+      .Where(st => st.Id == model.StudentId).First();
+
+      classObj.Accounts.Add(student);
+      _context.Update(classObj);
+      _context.SaveChanges();
+
+      return _mapper.Map<ClassResponse>(classObj);
+    }
+
+    public ClassResponse RemoveStudent(ChangeClassStudentRequest model)
+    {
+      Class classObj = _context.Classes.Include(cl => cl.Accounts)
+      .Where(cl => cl.Id == model.Id)
+      .First();
+
+      Account student = _context.Accounts
+      .Where(st => st.Id == model.StudentId).First();
+
+      classObj.Accounts.Remove(student);
+      _context.Update(classObj);
+      _context.SaveChanges();
+
+      return _mapper.Map<ClassResponse>(classObj);
+    }
+
     public IEnumerable<ClassResponse> GetAll()
     {
-      var classes = _context.Classes;
+      var classes = _context.Classes.Include(cl => cl.Accounts);
       return _mapper.Map<IList<ClassResponse>>(classes);
     }
 
-    public IEnumerable<ClassResponse> GetByLocationAndCourse(int locationId, int courseId)
+    public IEnumerable<ClassResponse> GetByLocationAndCourse(ClassesByLocationAndCourseRequest model)
     {
       var classes = _context.Classes
-        .Where(c => c.LocationId == locationId && c.CourseId == courseId);
+      .Include(cl => cl.Accounts)
+      .Where(c => c.LocationId == model.LocationId && c.CourseId == model.CourseId);
       return _mapper.Map<IList<ClassResponse>>(classes);
     }
 
-    public ClassResponse Update(int id, UpdateRequest model)
+    public ClassResponse Update(UpdateRequest model)
     {
-      var classObj = GetClass(id);
+      var classObj = GetClass(model.Id);
 
       _mapper.Map(model, classObj);
       _context.Classes.Update(classObj);
@@ -67,15 +104,13 @@ namespace CompManager.Services
       return _mapper.Map<ClassResponse>(classObj);
     }
 
-    public IEnumerable<ClassResponse> Delete(int id)
+    public void Delete(int id)
     {
       var classObj = GetClass(id);
       _context.Classes.Remove(classObj);
       _context.SaveChanges();
-
-      return _mapper.Map<IList<ClassResponse>>(GetByLocationAndCourse(classObj.LocationId, classObj.CourseId));
-
     }
+
     private Class GetClass(int id)
     {
       var classObj = _context.Classes.Find(id);

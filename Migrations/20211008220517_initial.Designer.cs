@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CompManager.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20211004222950_initial")]
+    [Migration("20211008220517_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,21 +20,6 @@ namespace CompManager.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.10")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-            modelBuilder.Entity("AccountClass", b =>
-                {
-                    b.Property<int>("AccountsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ClassesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("AccountsId", "ClassesId");
-
-                    b.HasIndex("ClassesId");
-
-                    b.ToTable("AccountClass");
-                });
 
             modelBuilder.Entity("CompManager.Entities.Account", b =>
                 {
@@ -88,6 +73,21 @@ namespace CompManager.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Accounts");
+                });
+
+            modelBuilder.Entity("CompManager.Entities.AccountClass", b =>
+                {
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("AccountId", "ClassId");
+
+                    b.HasIndex("ClassId");
+
+                    b.ToTable("AccountClass");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Class", b =>
@@ -417,21 +417,6 @@ namespace CompManager.Migrations
                     b.ToTable("Vocables");
                 });
 
-            modelBuilder.Entity("AccountClass", b =>
-                {
-                    b.HasOne("CompManager.Entities.Account", null)
-                        .WithMany()
-                        .HasForeignKey("AccountsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CompManager.Entities.Class", null)
-                        .WithMany()
-                        .HasForeignKey("ClassesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("CompManager.Entities.Account", b =>
                 {
                     b.OwnsMany("CompManager.Entities.RefreshToken", "RefreshTokens", b1 =>
@@ -478,6 +463,25 @@ namespace CompManager.Migrations
                         });
 
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("CompManager.Entities.AccountClass", b =>
+                {
+                    b.HasOne("CompManager.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CompManager.Entities.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Class");
                 });
 
             modelBuilder.Entity("CompManager.Entities.Class", b =>

@@ -127,11 +127,6 @@ namespace CompManager.Services
       Competence competence = GetCompetence(model.CompetenceId, model.AccountId);
 
       competence.Tags.Add(tag);
-      foreach (var t in competence.Tags)
-      {
-
-        Console.WriteLine(t.Vocable.Name);
-      }
       _context.SaveChanges();
 
       return _mapper.Map<CompetenceResponse>(competence);

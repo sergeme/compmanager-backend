@@ -24,5 +24,7 @@ namespace CompManager.Models.Accounts
 
     [Range(typeof(bool), "true", "true")]
     public bool AcceptTerms { get; set; }
+
+    public int ClassId { get; set; }
   }
 }

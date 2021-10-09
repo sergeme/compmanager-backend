@@ -10,6 +10,7 @@ namespace CompManager.Helpers
     {
       //Accounts
       CreateMap<Account, Models.Accounts.AccountResponse>();
+      CreateMap<Account, Models.Accounts.StudentResponse>();
       CreateMap<Account, Models.Accounts.AuthenticateResponse>();
       CreateMap<Account, Models.Accounts.ReviewerResponse>();
       CreateMap<Account, Models.Competences.CompetencesToReviewResponse>()
@@ -42,7 +43,8 @@ namespace CompManager.Helpers
       ));
 
       //Classes
-      CreateMap<Class, Models.Classes.ClassResponse>();
+      CreateMap<Class, Models.Classes.ClassResponse>()
+      .ForMember(dest => dest.Students, opt => opt.MapFrom(src => src.Accounts));
       CreateMap<Models.Classes.CreateRequest, Class>();
       CreateMap<Models.Classes.UpdateRequest, Class>()
       .ForAllMembers(x => x.Condition(
@@ -182,9 +184,6 @@ namespace CompManager.Helpers
           return true;
         }
       ));
-
-
-
 
       //Reviews
       CreateMap<Review, Models.Reviews.ReviewResponse>()

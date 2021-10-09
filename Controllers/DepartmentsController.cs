@@ -35,7 +35,6 @@ namespace CompManager.Controllers
       return Ok(department);
     }
 
-    [Authorize(Role.ROLE_ADMIN)]
     [HttpGet]
     public ActionResult<IEnumerable<DepartmentResponse>> GetAll()
     {

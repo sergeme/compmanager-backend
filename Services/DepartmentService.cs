@@ -62,7 +62,15 @@ namespace CompManager.Services
           {
             Id = l.Id,
             Name = l.Name,
-            Classes = l.Classes.Where(cl => cl.CourseId == c.Id).ToList()
+            Classes = l.Classes.Where(cl => cl.LocationId == l.Id).Select(c => new Class
+            {
+              Id = c.Id,
+              Name = c.Name,
+              StartDate = c.StartDate,
+              EndDate = c.EndDate,
+              CurriculumId = c.CurriculumId,
+              CourseId = c.CourseId
+            }).ToList()
           }).ToList()
         }).ToList()
       });

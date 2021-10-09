@@ -243,21 +243,21 @@ namespace CompManager.Migrations
                 name: "AccountClass",
                 columns: table => new
                 {
-                    AccountsId = table.Column<int>(type: "integer", nullable: false),
-                    ClassesId = table.Column<int>(type: "integer", nullable: false)
+                    ClassId = table.Column<int>(type: "integer", nullable: false),
+                    AccountId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccountClass", x => new { x.AccountsId, x.ClassesId });
+                    table.PrimaryKey("PK_AccountClass", x => new { x.AccountId, x.ClassId });
                     table.ForeignKey(
-                        name: "FK_AccountClass_Accounts_AccountsId",
-                        column: x => x.AccountsId,
+                        name: "FK_AccountClass_Accounts_AccountId",
+                        column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AccountClass_Classes_ClassesId",
-                        column: x => x.ClassesId,
+                        name: "FK_AccountClass_Classes_ClassId",
+                        column: x => x.ClassId,
                         principalTable: "Classes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -427,9 +427,9 @@ namespace CompManager.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AccountClass_ClassesId",
+                name: "IX_AccountClass_ClassId",
                 table: "AccountClass",
-                column: "ClassesId");
+                column: "ClassId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Classes_CourseId",

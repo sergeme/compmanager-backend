@@ -64,6 +64,16 @@ namespace CompManager.Helpers
       x => x.HasOne(x => x.Competence)
       .WithMany().HasForeignKey(x => x.CompetenceId)
       );
+
+      modelBuilder.Entity<Account>()
+      .HasMany(x => x.Classes)
+      .WithMany(x => x.Accounts)
+      .UsingEntity<AccountClass>(
+      x => x.HasOne(x => x.Class)
+      .WithMany().HasForeignKey(x => x.ClassId),
+      x => x.HasOne(x => x.Account)
+      .WithMany().HasForeignKey(x => x.AccountId)
+      );
     }
   }
 }

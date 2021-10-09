@@ -43,11 +43,35 @@ namespace CompManager.Controllers
       return Ok(classes);
     }
 
+    [Authorize(Role.ROLE_ADMIN, Role.ROLE_TEACHER)]
+    [HttpPost("by-location-and-course")]
+    public ActionResult<IEnumerable<ClassResponse>> GetByLocationAndCourse(ClassesByLocationAndCourseRequest model)
+    {
+      var classes = _classService.GetByLocationAndCourse(model);
+      return Ok(classes);
+    }
+
     [Authorize(Role.ROLE_ADMIN)]
     [HttpPut("{id:int}")]
-    public ActionResult<ClassResponse> Update(int id, UpdateRequest model)
+    public ActionResult<ClassResponse> Update(UpdateRequest model)
     {
-      var classObj = _classService.Update(id, model);
+      var classObj = _classService.Update(model);
+      return Ok(classObj);
+    }
+
+    [Authorize(Role.ROLE_TEACHER, Role.ROLE_ADMIN)]
+    [HttpPut("add-student")]
+    public ActionResult<ClassResponse> AddStudent(ChangeClassStudentRequest model)
+    {
+      var classObj = _classService.AddStudent(model);
+      return Ok(classObj);
+    }
+
+    [Authorize(Role.ROLE_TEACHER, Role.ROLE_ADMIN)]
+    [HttpPut("remove-student")]
+    public ActionResult<ClassResponse> RemoveStudent(ChangeClassStudentRequest model)
+    {
+      var classObj = _classService.RemoveStudent(model);
       return Ok(classObj);
     }
 

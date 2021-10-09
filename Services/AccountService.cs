@@ -9,9 +9,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+
+using Microsoft.EntityFrameworkCore;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.Accounts;
+using CompManager.Models.Classes;
 
 namespace CompManager.Services
 {
@@ -27,8 +30,8 @@ namespace CompManager.Services
     void ResetPassword(ResetPasswordRequest model);
     IEnumerable<AccountResponse> GetAll();
     AccountResponse GetById(int id);
-    AccountResponse Create(CreateRequest model);
-    AccountResponse Update(int id, UpdateRequest model);
+    AccountResponse Create(CompManager.Models.Accounts.CreateRequest model);
+    AccountResponse Update(int id, CompManager.Models.Accounts.UpdateRequest model);
     void Delete(int id);
   }
 
@@ -124,7 +127,6 @@ namespace CompManager.Services
 
       // map model to new account object
       var account = _mapper.Map<Account>(model);
-
       // first registered account is an admin
       var isFirstAccount = _context.Accounts.Count() == 0;
       account.Role = isFirstAccount ? Role.ROLE_ADMIN ^ Role.ROLE_TEACHER ^ Role.ROLE_STUDENT : Role.ROLE_STUDENT;
@@ -133,11 +135,16 @@ namespace CompManager.Services
 
       // hash password
       account.PasswordHash = BC.HashPassword(model.Password);
-
       // save account
       _context.Accounts.Add(account);
       _context.SaveChanges();
-
+      Console.WriteLine(model.ClassId);
+      if (model.ClassId != 0)
+      {
+        Class classObj = _context.Classes.Include(cl => cl.Accounts).Where(cl => cl.Id == model.ClassId).First();
+        classObj.Accounts.Add(account);
+        _context.SaveChanges();
+      }
       // send email
       sendVerificationEmail(account, origin);
     }
@@ -214,7 +221,7 @@ namespace CompManager.Services
       return _mapper.Map<AccountResponse>(account);
     }
 
-    public AccountResponse Create(CreateRequest model)
+    public AccountResponse Create(CompManager.Models.Accounts.CreateRequest model)
     {
       // validate
       if (_context.Accounts.Any(x => x.Email == model.Email))
@@ -235,7 +242,7 @@ namespace CompManager.Services
       return _mapper.Map<AccountResponse>(account);
     }
 
-    public AccountResponse Update(int id, UpdateRequest model)
+    public AccountResponse Update(int id, CompManager.Models.Accounts.UpdateRequest model)
     {
       var account = getAccount(id);
 

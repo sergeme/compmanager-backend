@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace CompManager.Models.Classes
 {
-  public class UpdateRequest
+  public class ClassesByLocationAndCourseRequest
   {
     [Required]
-    public int Id { get; set; }
+    public int LocationId { get; set; }
     [Required]
-    public string Name { get; set; }
+    public int CourseId { get; set; }
   }
 }
