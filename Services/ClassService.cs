@@ -11,7 +11,7 @@ namespace CompManager.Services
 {
   public interface IClassService
   {
-    ClassResponse Create(CreateRequest model);
+    IEnumerable<ClassResponse> Create(CreateRequest[] model);
     IEnumerable<ClassResponse> GetAll();
     IEnumerable<ClassResponse> GetByLocationAndCourse(ClassesByLocationAndCourseRequest model);
     ClassResponse Update(UpdateRequest model);
@@ -32,18 +32,23 @@ namespace CompManager.Services
       _mapper = mapper;
       _appSettings = appSettings.Value;
     }
-    public ClassResponse Create(CreateRequest model)
+    public IEnumerable<ClassResponse> Create(CreateRequest[] model)
     {
-      // validate
-      if (_context.Classes.Any(x => x.Name == model.Name))
-        throw new AppException($"Klasse '{model.Name}' besteht bereits");
+      List<Class> classList = new List<Class>();
+      foreach (CreateRequest classObj in model)
+      {
+        Class obj = new Class();
+        if (!_context.Classes.Any(x => x.Name == classObj.Name))
+        {
+          obj = _mapper.Map<Class>(classObj);
+          _context.Classes.Add(obj);
+          _context.SaveChanges();
+        }
+        classList.Add(obj);
 
-      var classObj = _mapper.Map<Class>(model);
+      }
 
-      _context.Classes.Add(classObj);
-      _context.SaveChanges();
-
-      return _mapper.Map<ClassResponse>(classObj);
+      return _mapper.Map<IList<ClassResponse>>(classList);
     }
 
 

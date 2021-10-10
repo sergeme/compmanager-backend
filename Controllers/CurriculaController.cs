@@ -51,10 +51,10 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_ADMIN)]
-    [HttpPut("{id:int}")]
-    public ActionResult<CurriculumResponse> Update(int id, UpdateRequest model)
+    [HttpPut]
+    public ActionResult<CurriculumResponse> Update(UpdateRequest model)
     {
-      var curriculum = _curriculumService.Update(id, model);
+      var curriculum = _curriculumService.Update(model);
       return Ok(curriculum);
     }
 

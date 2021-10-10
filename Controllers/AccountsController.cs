@@ -107,6 +107,22 @@ namespace CompManager.Controllers
       return Ok(accounts);
     }
 
+    [Authorize(Role.ROLE_ADMIN, Role.ROLE_TEACHER)]
+    [HttpGet("students")]
+    public ActionResult<IEnumerable<AccountResponse>> GetStudents()
+    {
+      var accounts = _accountService.GetStudents();
+      return Ok(accounts);
+    }
+
+    [Authorize(Role.ROLE_STUDENT)]
+    [HttpGet("teachers")]
+    public ActionResult<IEnumerable<AccountResponse>> GetTeachers()
+    {
+      var accounts = _accountService.GetTeachers();
+      return Ok(accounts);
+    }
+
     [Authorize(Role.ROLE_STUDENT, Role.ROLE_TEACHER, Role.ROLE_ADMIN)]
     [HttpGet("{id:int}")]
     public ActionResult<AccountResponse> GetById(int id)

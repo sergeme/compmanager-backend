@@ -13,8 +13,7 @@ namespace CompManager.Services
   {
     ProcessTypeResponse Create(CreateRequest model);
     IEnumerable<ProcessTypeResponse> GetAll();
-    ProcessTypeResponse GetById(int id, int curriculumId);
-    ProcessTypeResponse Update(int id, UpdateRequest model);
+    ProcessTypeResponse Update(UpdateRequest model);
     void Delete(int id);
     ProcessType GetProcessType(int id);
   }
@@ -52,33 +51,18 @@ namespace CompManager.Services
       var processTypes = _context.ProcessTypes.Include(pt => pt.Processes);
       return _mapper.Map<IList<ProcessTypeResponse>>(processTypes);
     }
-    public ProcessTypeResponse GetById(int id, int curriculumId)
-    {
-      var processType = _context.ProcessTypes.Where(pt => pt.Id == id)
-      .Select(c => new ProcessType
-      {
-        Id = c.Id,
-        Name = c.Name,
-        Processes = c.Processes
-        .Where(p => p.CurriculumId == curriculumId /*&& p.ProcessTypeId == id*/)
-        .ToList()
-      }).First();
 
-      return _mapper.Map<ProcessTypeResponse>(processType);
-
-    }
-
-    public ProcessTypeResponse Update(int id, UpdateRequest model)
+    public ProcessTypeResponse Update(UpdateRequest model)
     {
       var processType = _context.ProcessTypes
       .Include(pt => pt.Processes)
-      .Where(pt => pt.Id == id).First();
+      .Where(pt => pt.Id == model.Id).First();
 
       _mapper.Map(model, processType);
       _context.ProcessTypes.Update(processType);
       _context.SaveChanges();
 
-      return _mapper.Map<ProcessTypeResponse>(GetById(id, model.CurriculumId));
+      return _mapper.Map<ProcessTypeResponse>(processType);
     }
 
     public void Delete(int id)

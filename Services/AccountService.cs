@@ -29,6 +29,8 @@ namespace CompManager.Services
     void ValidateResetToken(ValidateResetTokenRequest model);
     void ResetPassword(ResetPasswordRequest model);
     IEnumerable<AccountResponse> GetAll();
+    IEnumerable<AccountResponse> GetTeachers();
+    IEnumerable<AccountResponse> GetStudents();
     AccountResponse GetById(int id);
     AccountResponse Create(CompManager.Models.Accounts.CreateRequest model);
     AccountResponse Update(int id, CompManager.Models.Accounts.UpdateRequest model);
@@ -212,6 +214,18 @@ namespace CompManager.Services
     public IEnumerable<AccountResponse> GetAll()
     {
       var accounts = _context.Accounts;
+      return _mapper.Map<IList<AccountResponse>>(accounts);
+    }
+
+    public IEnumerable<AccountResponse> GetTeachers()
+    {
+      var accounts = _context.Accounts.Where(a => a.Role.HasFlag(Role.ROLE_TEACHER));
+      return _mapper.Map<IList<AccountResponse>>(accounts);
+    }
+
+    public IEnumerable<AccountResponse> GetStudents()
+    {
+      var accounts = _context.Accounts.Where(a => a.Role.HasFlag(Role.ROLE_STUDENT));
       return _mapper.Map<IList<AccountResponse>>(accounts);
     }
 

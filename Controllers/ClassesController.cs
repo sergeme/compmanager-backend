@@ -29,7 +29,7 @@ namespace CompManager.Controllers
 
     [Authorize(Role.ROLE_ADMIN)]
     [HttpPost]
-    public ActionResult<ClassResponse> Create(CreateRequest model)
+    public ActionResult<ClassResponse> Create(CreateRequest[] model)
     {
       var classObj = _classService.Create(model);
       return Ok(classObj);

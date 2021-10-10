@@ -15,7 +15,7 @@ namespace CompManager.Services
     CurriculumResponse Create(CreateRequest model);
     IEnumerable<CurriculumResponse> GetAll();
     CurriculumResponse GetById(int id);
-    CurriculumResponse Update(int id, UpdateRequest model);
+    CurriculumResponse Update(UpdateRequest model);
     CurriculumResponse AddProcessType(ChangeCurriculumProcessTypeRequest model);
     CurriculumResponse RemoveProcessType(ChangeCurriculumProcessTypeRequest model);
     Curriculum GetCurriculum(int id);
@@ -86,17 +86,17 @@ namespace CompManager.Services
       return _mapper.Map<CurriculumResponse>(curriculum);
     }
 
-    public CurriculumResponse Update(int id, UpdateRequest model)
+    public CurriculumResponse Update(UpdateRequest model)
     {
       var curriculum = _context.Curricula
       .Include(c => c.ProcessTypes)
-      .Where(c => c.Id == id).First();
+      .Where(c => c.Id == model.Id).First();
 
       _mapper.Map(model, curriculum);
       _context.Curricula.Update(curriculum);
       _context.SaveChanges();
 
-      return _mapper.Map<CurriculumResponse>(GetById(id));
+      return _mapper.Map<CurriculumResponse>(GetById(model.Id));
     }
 
     public CurriculumResponse AddProcessType(ChangeCurriculumProcessTypeRequest model)
