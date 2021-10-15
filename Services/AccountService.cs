@@ -309,7 +309,7 @@ namespace CompManager.Services
       var tokenDescriptor = new SecurityTokenDescriptor
       {
         Subject = new ClaimsIdentity(new[] { new Claim("id", account.Id.ToString()) }),
-        Expires = DateTime.UtcNow.AddMinutes(15),
+        Expires = DateTime.UtcNow.AddSeconds(20),
         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
       };
       var token = tokenHandler.CreateToken(tokenDescriptor);

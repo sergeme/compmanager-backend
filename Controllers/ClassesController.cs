@@ -52,7 +52,7 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_ADMIN)]
-    [HttpPut("{id:int}")]
+    [HttpPut]
     public ActionResult<ClassResponse> Update(UpdateRequest model)
     {
       var classObj = _classService.Update(model);
@@ -80,7 +80,7 @@ namespace CompManager.Controllers
     public IActionResult Delete(int id)
     {
       _classService.Delete(id);
-      return Ok(new { message = "Standort gelöscht" });
+      return Ok(new { message = "Klasse gelöscht" });
     }
   }
 }

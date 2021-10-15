@@ -36,7 +36,7 @@ namespace CompManager.Controllers
 
     [Authorize(Role.ROLE_ADMIN)]
     [HttpGet]
-    public ActionResult<CreateRequest> GetAll(CreateRequest model)
+    public ActionResult<CreateRequest> GetAll()
     {
       var curriculum = _curriculumService.GetAll();
       return Ok(curriculum);

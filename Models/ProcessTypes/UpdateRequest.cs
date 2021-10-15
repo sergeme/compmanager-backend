@@ -7,6 +7,8 @@ namespace CompManager.Models.ProcessTypes
     [Required]
     public int Id { get; set; }
     [Required]
+    public int CourseId { get; set; }
+    [Required]
     public string Name { get; set; }
   }
 }

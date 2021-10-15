@@ -51,18 +51,8 @@ namespace CompManager.Services
     }
     public IEnumerable<CurriculumResponse> GetAll()
     {
-      var curricula = _context.Curricula.Select(c => new Curriculum
-      {
-        Id = c.Id,
-        Name = c.Name,
-        Created = c.Created,
-        ProcessTypes = c.ProcessTypes.Select(pt => new ProcessType
-        {
-          Id = pt.Id,
-          Name = pt.Name,
-          Processes = pt.Processes.Where(p => p.CurriculumId == c.Id).ToList()
-        }).ToList()
-      });
+      var curricula = _context.Curricula.Include(c => c.ProcessTypes);
+
 
       return _mapper.Map<IList<CurriculumResponse>>(curricula);
     }

@@ -13,7 +13,7 @@ namespace CompManager.Services
     ProcessResponse Create(CreateRequest model);
     IEnumerable<ProcessResponse> GetAll();
     IEnumerable<ProcessResponse> GetByProcessTypeAndCurriculum(int processTypeId, int curriculumId);
-    ProcessResponse Update(int id, UpdateRequest model);
+    ProcessResponse Update(UpdateRequest model);
     IEnumerable<ProcessResponse> Delete(int id);
   }
 
@@ -53,9 +53,9 @@ namespace CompManager.Services
       return _mapper.Map<IList<ProcessResponse>>(processes);
     }
 
-    public ProcessResponse Update(int id, UpdateRequest model)
+    public ProcessResponse Update(UpdateRequest model)
     {
-      var process = GetProcess(id);
+      var process = GetProcess(model.Id);
 
       _mapper.Map(model, process);
       _context.Processes.Update(process);

@@ -43,10 +43,10 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_ADMIN)]
-    [HttpPut("{id:int}")]
-    public ActionResult<ProcessResponse> Update(int id, UpdateRequest model)
+    [HttpPut]
+    public ActionResult<ProcessResponse> Update(UpdateRequest model)
     {
-      var process = _processService.Update(id, model);
+      var process = _processService.Update(model);
       return Ok(process);
     }
 
