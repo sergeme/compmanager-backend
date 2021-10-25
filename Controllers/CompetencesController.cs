@@ -1,11 +1,13 @@
-using AutoMapper;
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+using AutoMapper;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.Competences;
 using CompManager.Services;
+
 
 namespace CompManager.Controllers
 {
@@ -14,15 +16,18 @@ namespace CompManager.Controllers
   public class CompetencesController : BaseController
   {
     private readonly ICompetenceService _competenceService;
+    private readonly IDocumentService _documentService;
     private readonly IMapper _mapper;
     private readonly AppSettings _appSettings;
 
     public CompetencesController(
         ICompetenceService competenceService,
+        IDocumentService documentService,
         IMapper mapper,
         IOptions<AppSettings> appSettings)
     {
       _competenceService = competenceService;
+      _documentService = documentService;
       _appSettings = appSettings.Value;
       _mapper = mapper;
     }
@@ -36,10 +41,26 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_STUDENT)]
+    [HttpPost("get-competenceprofile")]
+    public String CreateProfile(CompetenceProfileCreateRequest model)
+    {
+      String file = _documentService.Create(model, Account);
+      return file;
+    }
+
+    [Authorize(Role.ROLE_STUDENT)]
     [HttpGet]
     public ActionResult<IEnumerable<CompetenceResponse>> GetByAccount()
     {
       var competence = _competenceService.GetByAccount(Account.Id);
+      return Ok(competence);
+    }
+
+    [Authorize(Role.ROLE_STUDENT)]
+    [HttpGet("get-tags")]
+    public ActionResult<IEnumerable<CompetenceResponse>> GetTagsByAccount()
+    {
+      var competence = _competenceService.GetTagsByAccount(Account.Id);
       return Ok(competence);
     }
 
@@ -60,15 +81,15 @@ namespace CompManager.Controllers
     }
 
     [Authorize]
-    [HttpPut("{id:int}")]
-    public ActionResult<CompetenceResponse> Update(int id, UpdateRequest model)
+    [HttpPut]
+    public ActionResult<CompetenceResponse> Update(UpdateRequest model)
     {
-      var competence = _competenceService.Update(id, model);
+      var competence = _competenceService.Update(model);
       return Ok(competence);
     }
 
     [Authorize(Role.ROLE_STUDENT)]
-    [HttpPost("add-tag")]
+    [HttpPut("add-tag")]
     public ActionResult<CompetenceResponse> AddTag(CompManager.Models.Tags.CreateRequest model)
     {
       if (model.AccountId != Account.Id)
@@ -78,7 +99,7 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_STUDENT)]
-    [HttpDelete("remove-tag")]
+    [HttpPut("remove-tag")]
     public ActionResult<CompetenceResponse> RemoveTag(ChangeCompetenceTagRequest model)
     {
       if (model.AccountId != Account.Id)
@@ -166,13 +187,13 @@ namespace CompManager.Controllers
     }
 
     [Authorize(Role.ROLE_STUDENT)]
-    [HttpDelete("{id:int}")]
+    [HttpDelete]
     public IActionResult Delete(RemoveRequest model)
     {
       if (model.AccountId != Account.Id)
         return Unauthorized(new { message = "Unauthorized" });
 
-      _competenceService.Delete(model.CompetenceId, Account.Id);
+      _competenceService.Delete(model);
       return Ok(new { message = "Kompetenz gelöscht" });
     }
   }

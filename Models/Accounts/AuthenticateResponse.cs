@@ -1,5 +1,7 @@
 using System;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using CompManager.Models.Classes;
 
 namespace CompManager.Models.Accounts
 {
@@ -18,5 +20,6 @@ namespace CompManager.Models.Accounts
 
     [JsonIgnore] // refresh token is returned in http only cookie
     public string RefreshToken { get; set; }
+    public IEnumerable<StudentClassesResponse> Classes { get; set; }
   }
 }

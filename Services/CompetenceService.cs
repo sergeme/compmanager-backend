@@ -1,11 +1,11 @@
-using AutoMapper;
-using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using AutoMapper;
 using CompManager.Entities;
 using CompManager.Helpers;
-using Microsoft.EntityFrameworkCore;
 using CompManager.Models.Competences;
 
 namespace CompManager.Services
@@ -14,9 +14,10 @@ namespace CompManager.Services
   {
     CompetenceResponse Create(CreateRequest model);
     IEnumerable<CompetenceResponse> GetByAccount(int accountId);
+    IEnumerable<CompManager.Models.Tags.TagResponse> GetTagsByAccount(int accountId);
     IEnumerable<CompetencesToReviewResponse> GetByTeacher(int accountId);
     CompetenceResponse GetById(int competenceId, int accountId);
-    CompetenceResponse Update(int competenceId, UpdateRequest model);
+    CompetenceResponse Update(UpdateRequest model);
     CompetenceResponse AddTag(CompManager.Models.Tags.CreateRequest model);
     CompetenceResponse RemoveTag(ChangeCompetenceTagRequest model);
     CompetenceResponse AddReview(CompManager.Models.Reviews.CreateRequest model);
@@ -26,7 +27,7 @@ namespace CompManager.Services
     CompetenceResponse UpdateComment(CompManager.Models.Comments.UpdateRequest model);
     IEnumerable<CompetencesToReviewResponse> AddCommentByTeacher(CompManager.Models.Comments.CreateRequest model, int accountId);
     CompetenceResponse RemoveComment(RemoveCompetenceCommentRequest model);
-    IEnumerable<CompetenceResponse> Delete(int competenceId, int accountId);
+    IEnumerable<CompetenceResponse> Delete(RemoveRequest model);
   }
 
   public class CompetenceService : ICompetenceService
@@ -61,7 +62,7 @@ namespace CompManager.Services
       _context.Competences.Add(competence);
       _context.SaveChanges();
 
-      return _mapper.Map<CompetenceResponse>(competence);
+      return _mapper.Map<CompetenceResponse>(GetById(competence.Id, model.AccountId));
     }
 
     public IEnumerable<CompetenceResponse> GetByAccount(int accountId)
@@ -69,9 +70,17 @@ namespace CompManager.Services
       var competences = _context.Competences.Where(c => c.AccountId == accountId)
       .Include(c => c.Reviews)
       .Include(c => c.Comments)
+      .Include(c => c.Process)
       .Include(c => c.Tags)
       .ThenInclude(t => t.Vocable);
       return _mapper.Map<IList<CompetenceResponse>>(competences);
+    }
+
+    public IEnumerable<CompManager.Models.Tags.TagResponse> GetTagsByAccount(int accountId)
+    {
+      var tags = _tagService.GetByAccount(accountId);
+
+      return _mapper.Map<IList<CompManager.Models.Tags.TagResponse>>(tags);
     }
 
     public IEnumerable<CompetencesToReviewResponse> GetByTeacher(int accountId)
@@ -85,7 +94,6 @@ namespace CompManager.Services
         .Select(c => new Competence
         {
           Id = c.Id,
-          Name = c.Name,
           Process = c.Process,
           Action = c.Action,
           Context = c.Context,
@@ -106,19 +114,26 @@ namespace CompManager.Services
       var competence = GetCompetence(competenceId, accountId);
       return _mapper.Map<CompetenceResponse>(competence);
     }
-    public CompetenceResponse Update(int competenceId, UpdateRequest model)
+    public CompetenceResponse Update(UpdateRequest model)
     {
       Competence competence = _context.Competences
+      .Where(c => c.Id == model.Id)
       .Include(c => c.Reviews)
       .Include(c => c.Comments)
+      .Include(c => c.Process)
       .Include(c => c.Tags)
-      .Where(c => c.Id == competenceId).First();
+      .ThenInclude(t => t.Vocable).First();
+
+      Process process = _context.Processes
+      .Where(p => p.Id == model.ProcessId).First();
+
+      competence.Process = process;
 
       _mapper.Map(model, competence);
       _context.Competences.Update(competence);
       _context.SaveChanges();
 
-      return _mapper.Map<CompetenceResponse>(GetById(competenceId, model.AccountId));
+      return _mapper.Map<CompetenceResponse>(competence);
     }
 
     public CompetenceResponse AddTag(CompManager.Models.Tags.CreateRequest model)
@@ -219,9 +234,9 @@ namespace CompManager.Services
       return _mapper.Map<CompetenceResponse>(GetById(model.CompetenceId, model.AccountId));
     }
 
-    public IEnumerable<CompetenceResponse> Delete(int competenceId, int accountId)
+    public IEnumerable<CompetenceResponse> Delete(RemoveRequest model)
     {
-      Competence competence = GetCompetence(competenceId, accountId);
+      Competence competence = GetCompetence(model.CompetenceId, model.AccountId);
       _context.Competences.Remove(competence);
       _context.SaveChanges();
 
@@ -233,6 +248,7 @@ namespace CompManager.Services
       Competence competence = _context.Competences
       .Include(c => c.Reviews.OrderBy(review => review.Id))
       .Include(c => c.Comments.OrderBy(comment => comment.Id))
+      .Include(c => c.Process)
       .Include(c => c.Tags.OrderBy(tag => tag.Id))
       .ThenInclude(t => t.Vocable)
       .Where(c => c.Id == id && c.AccountId == accountId).First();

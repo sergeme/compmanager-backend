@@ -48,7 +48,7 @@ namespace CompManager.Services
       {
         Id = t.Id,
         Vocable = t.Vocable
-      }).GroupBy(t => t.VocableId).ToList();
+      }).ToList();
 
       return _mapper.Map<IList<TagResponse>>(tags);
     }

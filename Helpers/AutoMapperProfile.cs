@@ -45,6 +45,7 @@ namespace CompManager.Helpers
       //Classes
       CreateMap<Class, Models.Classes.ClassResponse>()
       .ForMember(dest => dest.Students, opt => opt.MapFrom(src => src.Accounts));
+      CreateMap<Class, Models.Classes.StudentClassesResponse>();
       CreateMap<Models.Classes.CreateRequest, Class>();
       CreateMap<Models.Classes.UpdateRequest, Class>()
       .ForAllMembers(x => x.Condition(
@@ -181,6 +182,8 @@ namespace CompManager.Helpers
         (src, dest, prop) =>
         {
           if (prop == null) return false;
+          if (x.DestinationMember.Name == "CourseId" && src.CourseId == 0) return false;
+
           return true;
         }
       ));

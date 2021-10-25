@@ -6,7 +6,6 @@ using System;
 using CompManager.Helpers;
 using CompManager.Middleware;
 using CompManager.Services;
-using CompManager.Entities;
 
 namespace CompManager
 {
@@ -53,6 +52,7 @@ namespace CompManager
       services.AddScoped<ILocationService, LocationService>();
       services.AddScoped<IProcessService, ProcessService>();
       services.AddScoped<IProcessTypeService, ProcessTypeService>();
+      services.AddScoped<IDocumentService, DocumentService>();
     }
 
     // configure the HTTP request pipeline

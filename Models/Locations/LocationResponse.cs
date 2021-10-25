@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using CompManager.Models.Classes;
-
 namespace CompManager.Models.Locations
 {
   public class LocationResponse

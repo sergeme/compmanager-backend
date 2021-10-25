@@ -1,5 +1,3 @@
-using System;
-
 namespace CompManager.Models.Accounts
 {
   public class StudentResponse

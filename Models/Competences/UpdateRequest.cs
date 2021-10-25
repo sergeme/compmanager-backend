@@ -5,6 +5,8 @@ namespace CompManager.Models.Competences
   public class UpdateRequest
   {
     [Required]
+    public int Id { get; set; }
+    [Required]
     public int ProcessId { get; set; }
     [Required]
     public int AccountId { get; set; }

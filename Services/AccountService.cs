@@ -1,7 +1,5 @@
 using AutoMapper;
 using BC = BCrypt.Net.BCrypt;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,12 +7,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using CompManager.Entities;
 using CompManager.Helpers;
 using CompManager.Models.Accounts;
-using CompManager.Models.Classes;
 
 namespace CompManager.Services
 {
@@ -58,7 +56,12 @@ namespace CompManager.Services
 
     public AuthenticateResponse Authenticate(AuthenticateRequest model, string ipAddress)
     {
-      var account = _context.Accounts.SingleOrDefault(x => x.Email == model.Email);
+      var account = _context.Accounts.Include(x => x.Classes)
+      .ThenInclude(c => c.Course)
+      .Include(x => x.Classes)
+      .ThenInclude(c => c.Curriculum)
+      .ThenInclude(cu => cu.ProcessTypes)
+      .SingleOrDefault(x => x.Email == model.Email);
 
       if (account == null || !account.IsVerified || !BC.Verify(model.Password, account.PasswordHash))
         throw new AppException("E-Mail oder Passwort fehlerhaft");
@@ -309,7 +312,7 @@ namespace CompManager.Services
       var tokenDescriptor = new SecurityTokenDescriptor
       {
         Subject = new ClaimsIdentity(new[] { new Claim("id", account.Id.ToString()) }),
-        Expires = DateTime.UtcNow.AddSeconds(20),
+        Expires = DateTime.UtcNow.AddMinutes(_appSettings.JWTTokenTTL),
         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
       };
       var token = tokenHandler.CreateToken(tokenDescriptor);

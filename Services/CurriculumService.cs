@@ -69,6 +69,7 @@ namespace CompManager.Services
         {
           Id = pt.Id,
           Name = pt.Name,
+          CourseId = pt.CourseId,
           Processes = pt.Processes.Where(p => p.CurriculumId == id).ToList()
         }).ToList()
       }).First();

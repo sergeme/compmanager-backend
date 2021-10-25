@@ -1,8 +1,4 @@
-using System.Collections.Generic;
-using CompManager.Models.Reviews;
 using CompManager.Models.Processes;
-using CompManager.Models.Comments;
-using CompManager.Models.Tags;
 
 namespace CompManager.Models.Competences
 {

@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using CompManager.Models.Processes;
-
 namespace CompManager.Models.ProcessTypes
 {
   public class ProcessTypeResponse

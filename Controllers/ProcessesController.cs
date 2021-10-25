@@ -34,7 +34,7 @@ namespace CompManager.Controllers
       return Ok(process);
     }
 
-    [Authorize(Role.ROLE_ADMIN)]
+    [Authorize(Role.ROLE_ADMIN, Role.ROLE_TEACHER, Role.ROLE_STUDENT)]
     [HttpGet]
     public ActionResult<CreateRequest> GetAll()
     {

@@ -2,7 +2,6 @@ using AutoMapper;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System;
 using System.Linq;
 using CompManager.Entities;
 using CompManager.Helpers;
